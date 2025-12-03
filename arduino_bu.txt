@@ -1,0 +1,64 @@
+const char MAIN_page[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Adventskranz</title>
+  <style>
+    body { background-color: #121212; color: #f0f0f0; font-family: sans-serif; }
+    #advent-wreath { display: flex; gap: 12px; margin: 20px 0; }
+    button { background-color: #1e1e1e; color: #f0f0f0; border: 2px solid #f0f0f0;
+             cursor: pointer; padding: 10px 20px; border-radius: 6px; }
+    button.lit { background-color: gold; color: #121212; border: none; }
+  </style>
+</head>
+<body>
+  <h1>Fröhlichen Advent!</h1>
+  <div id="advent-wreath">
+    <button id="led1">Kerze 1</button>
+    <button id="led2">Kerze 2</button>
+    <button id="led3">Kerze 3</button>
+    <button id="led4">Kerze 4</button>
+  </div>
+  <div id="date_box">
+    <p id="date_text">Heutiges Datum:</p>
+    <p id="date"></p>
+  </div>
+  <script>
+    function getDate() {
+      const el = document.getElementById('date');
+      const today = new Date();
+      const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+      el.textContent = today.toLocaleDateString('de-DE', opts);
+      return today;
+    }
+    function lightcandles() {
+      const ids = ['led1','led2','led3','led4'];
+      const date = getDate();
+      const start = new Date(2025, 10, 30); // 30 Nov 2025
+      const diff = Math.floor((date - start) / (1000 * 60 * 60 * 24));
+      const candles = Math.min(4, Math.floor(diff/7) + 1);
+      for (let i = 0; i < candles; i++) {
+        document.getElementById(`led${i+1}`).classList.add('lit');
+        fetch(`/toggle?led=led${i+1}&state=true`);
+      }
+      ids.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.addEventListener('click', () => {
+          const lit = btn.classList.toggle('lit');
+          fetch(`/toggle?led=${id}&state=${lit}`);
+        });
+      });
+      // Sync from board
+      fetch('/state').then(r => r.json()).then(states => {
+        ids.forEach((id, i) => {
+          const btn = document.getElementById(id);
+          if (states[i]) btn.classList.add('lit'); else btn.classList.remove('lit');
+        });
+      });
+    }
+    document.addEventListener('DOMContentLoaded', lightcandles);
+  </script>
+</body>
+</html>
+)rawliteral";

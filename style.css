@@ -1,0 +1,46 @@
+body {
+  background-color: #121212;
+  color: #f0f0f0;
+  text-align: center;
+}
+
+h1 {
+    color: gold;
+}
+
+button {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  border: 2px solid #f0f0f0;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+button.lit {
+  background-color: gold;
+  color: #121212;
+  border: none;
+  padding: 10px 20px;
+}
+
+button.action:hover {
+  background: #1e1e1e;
+}
+
+.advent-wreath{
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    height: 20%;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+}
+
+.date-box {
+    position: absolute;
+    top: 10%;
+    right: 0%;
+    width: auto;
+    height: 20%;
+}
