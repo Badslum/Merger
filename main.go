@@ -38,18 +38,44 @@ import (
 */
 func main() {
 	var (
-		html, css, js []byte = nil, nil, nil
-		err           error
+		cpp, html, css, js []byte = nil, nil, nil, nil
+		err                error
 	)
-
-	html, err = os.ReadFile("index.html")
+	if c, err := os.ReadDir("input"); err != nil || len(c) == 0 {
+		if err == nil {
+			err = errors.New("input directory is empty")
+		}
+		fmt.Printf("Could not read input directory due to error %v", err, "Stopping process")
+		panic("Nothing to do")
+	}
+	if _, err := os.ReadDir("output"); err != nil {
+		os.MkdirAll("output", os.ModePerm)
+		err = nil
+	}
+	for _, s := range []string{"main.c", "main.cpp", "firmware.c", "firmware.cpp", "sketch.c", "sketch.cpp"} {
+		cpp, err = os.ReadFile("input/" + s)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				err = nil
+				continue
+			} else {
+				fmt.Printf("Could not read %v file due to error %v", s, err)
+			}
+		}
+	}
+	if cpp == nil {
+		fmt.Printf("No cpp file, skipping")
+	} else {
+		os.WriteFile("main.cpp", cpp, 0644)
+	}
+	html, err = os.ReadFile("input/index.html")
 	if err != nil {
 		fmt.Printf("Could not read index.html file due to error %v", err, "Stopping process")
 		panic("Nothing to do")
 	}
 	merged := string(html)
 	for _, s := range []string{"style.css", "styles.css", "stylesheet.css"} {
-		css, err = os.ReadFile(s)
+		css, err = os.ReadFile("input/" + s)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				err = nil
@@ -63,7 +89,7 @@ func main() {
 		fmt.Printf("Could not read css file")
 	}
 	for _, s := range []string{"script.js", "main.js", "index.js"} {
-		css, err = os.ReadFile(s)
+		css, err = os.ReadFile("input/" + s)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				err = nil
@@ -91,6 +117,6 @@ func main() {
 			fmt.Sprintf("<script>%s</script>", string(js)))
 	}
 	header := fmt.Sprintf(`const char MAIN_page[] PROGMEM = R"rawliteral(%s)rwaliteral";`, merged)
-	os.WriteFile("index_html.h", []byte(header), 0644)
+	os.WriteFile("output/index_html.h", []byte(header), 0644)
 	return
 }
