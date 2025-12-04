@@ -45,7 +45,7 @@ func main() {
 		if err == nil {
 			err = errors.New("input directory is empty")
 		}
-		fmt.Printf("Could not read input directory due to error %v", err, "Stopping process")
+		fmt.Printf("Could not read input directory due to error %v %v", err, "Stopping process")
 		panic("Nothing to do")
 	}
 	if _, err := os.ReadDir("output"); err != nil {
@@ -70,7 +70,7 @@ func main() {
 	}
 	html, err = os.ReadFile("input/index.html")
 	if err != nil {
-		fmt.Printf("Could not read index.html file due to error %v", err, "Stopping process")
+		fmt.Printf("Could not read index.html file due to error %v %v", err, "Stopping process")
 		panic("Nothing to do")
 	}
 	merged := string(html)
@@ -85,11 +85,13 @@ func main() {
 			break
 		}
 	}
-	if css == nil {
-		fmt.Printf("Could not read css file")
+	if css != nil {
+		merged = strings.ReplaceAll(merged,
+			"<link rel=\"stylesheet\" href=\"styles.css\">",
+			fmt.Sprintf("<style>%s</style>", string(css)))
 	}
 	for _, s := range []string{"script.js", "main.js", "index.js"} {
-		css, err = os.ReadFile("input/" + s)
+		js, err = os.ReadFile("input/" + s)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				err = nil
@@ -99,18 +101,6 @@ func main() {
 			break
 		}
 	}
-	if js == nil {
-		fmt.Printf("Could not read js file")
-	}
-	if css == nil && js == nil {
-		fmt.Println("No CSS or JS files to embed. Stopping process")
-		panic("Nothing to do")
-	}
-	if css != nil {
-		merged = strings.ReplaceAll(merged,
-			"<link rel=\"stylesheet\" href=\"styles.css\">",
-			fmt.Sprintf("<style>%s</style>", string(css)))
-	}
 	if js != nil {
 		merged = strings.ReplaceAll(merged,
 			"<script src=\"script.js\"></script>",
@@ -118,5 +108,4 @@ func main() {
 	}
 	header := fmt.Sprintf(`const char MAIN_page[] PROGMEM = R"rawliteral(%s)rwaliteral";`, merged)
 	os.WriteFile("output/index_html.h", []byte(header), 0644)
-	return
 }
