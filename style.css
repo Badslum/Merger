@@ -17,6 +17,10 @@ button {
   cursor: pointer;
 }
 
+button.action:hover {
+  background: #1e1e1e;
+}
+
 button.lit {
   background-color: gold;
   color: #121212;
@@ -25,8 +29,8 @@ button.lit {
   padding: 10px 20px;
 }
 
-button.action:hover {
-  background: #1e1e1e;
+button.lit:hover {
+  background-color: #ffd700;
 }
 
 .advent-wreath{

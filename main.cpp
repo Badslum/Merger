@@ -10,13 +10,12 @@ const char* ap_psk = "iusearchbtw";
 //#define AP_MODE
 ESP8266WebServer server(80);
 
-#define LED1 D1
-#define LED2 D2
-#define LED3 D3
-#define LED4 D4
-#define LED13 D13
+#define LED1 D4
+#define LED2 D3
+#define LED3 D2
+#define LED4 D1
 
-int ledPins[] = {D1, D2, D3, D4};
+int ledPins[] = {D4, D3, D2, D1};
 bool ledStates[] = {false, false, false, false};
 
 void setup() {
@@ -27,9 +26,18 @@ void setup() {
     digitalWrite(ledPins[i], LOW);
   }
 
-  // Starting AP mode
+  // Starting Entrypoint
+  #ifdef AP_MODE
+    Serial.println("Starting in AP Mode");
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ap_ssid, ap_psk);
+  #else
+    Serial.println("Starting in STA Mode");
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, psk);
+    while (WiFi.status() != WL_CONNECTED) delay(500);
+    Serial.println("Connected! IP: %v", WiFi.localIP());
+  #endif
   delay(300);
   Serial.print("AP IP: ");
   Serial.println(WiFi.softAPIP());
@@ -44,11 +52,10 @@ void setup() {
       server.send(400, "text/plain", "Missing led/state");
       return;
     }
-
+    // Define LED ID and state, then parsing values from frontend
     String ledId = server.arg("led");
     String state = server.arg("state");
     int index = ledId.substring(3).toInt() - 1;
-
     if (index >= 0 && index < 4) {
       bool on = (state == "true");
       ledStates[index] = on;
@@ -76,4 +83,16 @@ void setup() {
 
 void loop() {
   server.handleClient();
+  flicker();
+}
+
+void flicker(){
+  int led = random(0,4);
+  if ledStates[led] == true{
+    int chance = random(0,10);
+    if (chance > 7 || millis() > 200 && chance > 3){
+      int brightness = random(50, 255);
+      analogWrite(ledPins[led], brightness);
+    }
+  }
 }
