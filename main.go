@@ -17,22 +17,27 @@ import (
 
 ----------------------------------------------------------
 
-	const Reads "input/*"
+	const Reads(
+	"input/*"
+	)
 	const Generates(
 	"output/index_html.h" as "MAIN_page[]" variable,
 	"output/main.cpp" when "input/*.cpp" exists
 	)
 	const Usage(
-	1. Place html, css, and js files in the "/input" folder
-	2. Run: "go run main.go"
-	3. Extract the generated files from "/output"
+	Place: html, css, and js files in "/input"
+	Run: "go run main.go" in terminal
+	Extract: generated files from "/output"
 	)
 
 ----------------------------------------------------------
 
-	var author "Bastian Roth"
-	var date "04 Dec 2025"
-	var version "1.0"
+	var(
+	author 	"Bastian Roth"
+	date 	"04 Dec 2025"
+	version "1.0"
+	license "MIT"
+	)
 
 ----------------------------------------------------------
 */
