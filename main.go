@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -16,17 +17,16 @@ import (
 
 ----------------------------------------------------------
 
-	const Reads{
-	"index.html", "style.css", "script.js"
-		}
-	const Generates{
-	"index_html.h" as "MAIN_page[]" variable
-	}
-	const Usage{
-	1. Place "index.html", "styles.css", and "script.js" in the same directory as this Go file
+	const Reads "input/*"
+	const Generates(
+	"output/index_html.h" as "MAIN_page[]" variable,
+	"output/main.cpp" when "input/*.cpp" exists
+	)
+	const Usage(
+	1. Place html, css, and js files in the "/input" folder
 	2. Run: "go run main.go"
-	3. The generated "index_html.h" file will contain the embedded HTML content.
-	}
+	3. Extract the generated files from "/output"
+	)
 
 ----------------------------------------------------------
 
@@ -39,33 +39,59 @@ import (
 func main() {
 	var (
 		cpp, html, css, js []byte = nil, nil, nil, nil
+		content            []string
 		err                error
 	)
-	if c, err := os.ReadDir("input"); err != nil || len(c) == 0 {
+	if files, err := os.ReadDir("input"); err != nil || len(files) == 0 {
 		if err == nil {
 			err = errors.New("input directory is empty")
 		}
 		fmt.Printf("Could not read input directory due to error %v %v", err, "Stopping process")
 		panic("Nothing to do")
+	} else {
+		for _, file := range files {
+			fmt.Printf("Found input file: %v\n", file.Name())
+			content = append(content, file.Name())
+		}
 	}
 	if _, err := os.ReadDir("output"); err != nil {
 		os.MkdirAll("output", os.ModePerm)
 		err = nil
 	}
-	for _, s := range []string{"main.c", "main.cpp", "firmware.c", "firmware.cpp", "sketch.c", "sketch.cpp"} {
-		cpp, err = os.ReadFile("input/" + s)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				err = nil
-				continue
-			} else {
+	for _, s := range content {
+		switch ext := strings.ToLower(s[strings.LastIndex(s, "."):]); ext {
+		case ".cpp":
+			cpp, err = os.ReadFile("input/" + s)
+		case ".html":
+			html, err = os.ReadFile("input/" + s)
+			if err != nil {
+				fmt.Printf("Could not read %v file due to error %v %v", s, err, "Stopping process")
+				panic("Nothing to do")
+			}
+		case ".css":
+			css, err = os.ReadFile("input/" + s)
+			if err != nil {
 				fmt.Printf("Could not read %v file due to error %v", s, err)
 			}
+		case ".js":
+			js, err = os.ReadFile("input/" + s)
+			if err != nil {
+				fmt.Printf("Could not read %v file due to error %v", s, err)
+			}
+		default:
+			fmt.Printf("Unknown file type: %v, skipping\n", s)
 		}
 	}
-	if cpp == nil {
-		fmt.Printf("No cpp file, skipping")
-	} else {
+	merged := string(html)
+	if css != nil {
+		reCSS := regexp.MustCompile(`<link[^>]*href="style.css"[^>]*>`)
+		merged = reCSS.ReplaceAllString(merged, "<style>\n"+strings.TrimSpace(string(css))+"\n</style>")
+	}
+	if js != nil {
+		reJS := regexp.MustCompile(`<script[^>]*src="main.js"[^>]*></script>`)
+		merged = reJS.ReplaceAllString(merged, "<script>\n"+strings.TrimSpace(string(js))+"\n</script>")
+	}
+	if cpp != nil {
 		var (
 			psk      string = os.Getenv("psk")
 			ap_psk   string = os.Getenv("ap_psk")
@@ -79,44 +105,6 @@ func main() {
 		}
 		cpp = []byte(replaced)
 		os.WriteFile("main.cpp", cpp, 0644)
-	}
-	html, err = os.ReadFile("input/index.html")
-	if err != nil {
-		fmt.Printf("Could not read index.html file due to error %v %v", err, "Stopping process")
-		panic("Nothing to do")
-	}
-	merged := string(html)
-	for _, s := range []string{"style.css", "styles.css", "stylesheet.css"} {
-		css, err = os.ReadFile("input/" + s)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				err = nil
-				continue
-			}
-			fmt.Printf("Could not read %v file due to error %v", s, err)
-			break
-		}
-	}
-	if css != nil {
-		merged = strings.ReplaceAll(merged,
-			"<link rel=\"stylesheet\" href=\"styles.css\">",
-			fmt.Sprintf("<style>%s</style>", string(css)))
-	}
-	for _, s := range []string{"script.js", "main.js", "index.js"} {
-		js, err = os.ReadFile("input/" + s)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				err = nil
-				continue
-			}
-			fmt.Printf("Could not read %v file due to error %v", s, err)
-			break
-		}
-	}
-	if js != nil {
-		merged = strings.ReplaceAll(merged,
-			"<script src=\"script.js\"></script>",
-			fmt.Sprintf("<script>%s</script>", string(js)))
 	}
 	header := fmt.Sprintf(`const char MAIN_page[] PROGMEM = R"rawliteral(%s)rwaliteral";`, merged)
 	os.WriteFile("output/index_html.h", []byte(header), 0644)

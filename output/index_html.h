@@ -1,0 +1,117 @@
+const char MAIN_page[] PROGMEM = R"rawliteral(<html>
+<head>
+    <title>Adventskranz</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Bastian Roth">
+    <meta name="date" content="30.11.2025">
+    <style>
+body {
+  background-color: #121212;
+  color: #f0f0f0;
+  text-align: center;
+}
+
+h1 {
+    color: gold;
+}
+
+button {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  border: 2px solid #f0f0f0;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+button.action:hover {
+  background: #1e1e1e;
+}
+
+button.lit {
+  background-color: gold;
+  color: #121212;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+}
+
+button.lit:hover {
+  background-color: #ffd700;
+}
+
+.advent-wreath{
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    height: 20%;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+}
+
+.date-box {
+    position: absolute;
+    top: 10%;
+    right: 0%;
+    width: auto;
+    height: 20%;
+}
+</style>
+    <script>
+function getDate() {
+    const dateElement = document.getElementById('date');
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    dateElement.textContent = today.toLocaleDateString('de-DE', options);
+    if (today.getDate() === 24 && today.getMonth() === 11) {
+        document.querySelector('h1').textContent = "Fr&ouml;hliche Weihnachten!";
+    }
+    return today;
+}
+function getFirstAdvent(year) {
+  let christmas = new Date(year, 11, 25);
+  let firstAdvent = new Date(christmas);
+  firstAdvent.setDate(christmas.getDate() - 28);
+  while (firstAdvent.getDay() !== 0) {
+    firstAdvent.setDate(firstAdvent.getDate() + 1);
+  }
+  return firstAdvent;
+}
+function lightcandles() {
+    const leds = ['led1','led2','led3','led4'];
+    const today = getDate();
+    const start = getFirstAdvent(today.getFullYear());
+    const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+    const candles = Math.min(4, Math.floor(diff/7) +1);
+    for (let i = 0; i < candles; i++) {
+    document.getElementById(`led${i+1}`).classList.add('lit');
+    fetch(`/toggle?led=led${i+1}&state=true`);
+    }
+    leds.forEach(id => {
+        const led = document.getElementById(id);
+        led.addEventListener('click', () => {
+            led.classList.toggle('lit');
+            fetch(`/toggle?led=&state=${led.classList.contains('lit')}`);
+        });
+    })
+}
+document.addEventListener('DOMContentLoaded', () => {
+    lightcandles();
+});
+</script>
+</head>
+<body>
+    <h1> Fr&ouml;hlichen Advent! </h1>
+    <div id="advent-wreath">
+        <button id="led1">Kerze 1</button>
+        <button id="led2">Kerze 2</button>
+        <button id="led3">Kerze 3</button>
+        <button id="led4">Kerze 4</button>
+    </div>
+    <div id="date-box">
+        <p id="date-text">Heutiges Datum:</p>
+        <p id="date"></p>
+    </div>
+</body>
+</html>)rwaliteral";
