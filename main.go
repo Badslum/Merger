@@ -66,6 +66,18 @@ func main() {
 	if cpp == nil {
 		fmt.Printf("No cpp file, skipping")
 	} else {
+		var (
+			psk      string = os.Getenv("psk")
+			ap_psk   string = os.Getenv("ap_psk")
+			replaced string = string(cpp)
+		)
+		if psk != "" {
+			replaced = strings.ReplaceAll(replaced, `const char* psk = "pwd";`, fmt.Sprintf(`const char* psk = "%v";`, psk))
+		}
+		if ap_psk != "" {
+			replaced = strings.ReplaceAll(replaced, `const char* ap_psk = "ap_pwd";`, fmt.Sprintf(`const char* ap_psk = "%v";`, ap_psk))
+		}
+		cpp = []byte(replaced)
 		os.WriteFile("main.cpp", cpp, 0644)
 	}
 	html, err = os.ReadFile("input/index.html")

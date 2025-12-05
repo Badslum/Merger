@@ -3,9 +3,9 @@
 #include "index_html.h"
 
 const char* ssid = "MicroTik6_2GHz";
-const char* psk = "rasp1234rasp";
+const char* psk = "pwd";
 const char* ap_ssid = "MomClickHereForInternet";
-const char* ap_psk = "iusearchbtw";
+const char* ap_psk = "ap_pwd";
 
 //#define AP_MODE
 ESP8266WebServer server(80);
@@ -29,8 +29,8 @@ void setup() {
   // Starting Entrypoint
   #ifdef AP_MODE
     Serial.println("Starting in AP Mode");
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(ap_ssid, ap_psk);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(ap_ssid, ap_psk);
   #else
     Serial.println("Starting in STA Mode");
     WiFi.mode(WIFI_STA);
