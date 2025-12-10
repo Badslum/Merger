@@ -31,7 +31,7 @@ button.action:hover {
 button.lit {
   background-color: gold;
   color: #121212;
-  border: none;
+  border: 2px solid gold;
   border-radius: 4px;
   padding: 10px 20px;
 }
@@ -84,17 +84,26 @@ function lightcandles() {
     const start = getFirstAdvent(today.getFullYear());
     const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
     const candles = Math.min(4, Math.floor(diff/7) +1);
+    // Auto toggle
     for (let i = 0; i < candles; i++) {
     document.getElementById(`led${i+1}`).classList.add('lit');
     fetch(`/toggle?led=led${i+1}&state=true`);
     }
+    // Toggle LEDs
     leds.forEach(id => {
         const led = document.getElementById(id);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            fetch(`/toggle?led=&state=${led.classList.contains('lit')}`);
+            fetch(`/toggle?led=&state=`);
         });
     })
+    // sync from board
+    fetch('/state').then(r => r.json()).then(states => {
+        ids.forEach((id, i) => {
+          const btn = document.getElementById(id);
+          if (states[i]) btn.classList.add('lit'); else btn.classList.remove('lit');
+        });
+      });
 }
 document.addEventListener('DOMContentLoaded', () => {
     lightcandles();
@@ -114,4 +123,4 @@ document.addEventListener('DOMContentLoaded', () => {
         <p id="date"></p>
     </div>
 </body>
-</html>)rwaliteral";
+</html>)rawliteral";

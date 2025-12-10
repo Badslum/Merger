@@ -23,10 +23,12 @@ function lightcandles() {
     const start = getFirstAdvent(today.getFullYear());
     const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
     const candles = Math.min(4, Math.floor(diff/7) +1);
+    // Auto toggle
     for (let i = 0; i < candles; i++) {
     document.getElementById(`led${i+1}`).classList.add('lit');
     fetch(`/toggle?led=led${i+1}&state=true`);
     }
+    // Toggle LEDs
     leds.forEach(id => {
         const led = document.getElementById(id);
         led.addEventListener('click', () => {
@@ -34,6 +36,13 @@ function lightcandles() {
             fetch(`/toggle?led=${id}&state=${led.classList.contains('lit')}`);
         });
     })
+    // sync from board
+    fetch('/state').then(r => r.json()).then(states => {
+    leds.forEach((id, i) => {
+      const led = document.getElementById(id);
+      if (states[i]) led.classList.add('lit'); else led.classList.remove('lit');
+    });
+});
 }
 document.addEventListener('DOMContentLoaded', () => {
     lightcandles();

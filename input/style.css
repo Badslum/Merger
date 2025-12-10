@@ -24,7 +24,7 @@ button.action:hover {
 button.lit {
   background-color: gold;
   color: #121212;
-  border: none;
+  border: 2px solid gold;
   border-radius: 4px;
   padding: 10px 20px;
 }
