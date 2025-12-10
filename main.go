@@ -67,6 +67,9 @@ func main() {
 		switch ext := strings.ToLower(s[strings.LastIndex(s, "."):]); ext {
 		case ".cpp":
 			cpp, err = os.ReadFile("input/" + s)
+			if err != nil {
+				fmt.Printf("Could not read %v file due to error %v", s, err)
+			}
 		case ".html":
 			html, err = os.ReadFile("input/" + s)
 			if err != nil {
@@ -109,7 +112,7 @@ func main() {
 			replaced = strings.ReplaceAll(replaced, `const char* ap_psk = "ap_pwd";`, fmt.Sprintf(`const char* ap_psk = "%v";`, ap_psk))
 		}
 		cpp = []byte(replaced)
-		os.WriteFile("main.cpp", cpp, 0644)
+		os.WriteFile("output/main.cpp", cpp, 0644)
 	}
 	header := fmt.Sprintf(`const char MAIN_page[] PROGMEM = R"rawliteral(%s)rawliteral";`, merged)
 	os.WriteFile("output/index_html.h", []byte(header), 0644)

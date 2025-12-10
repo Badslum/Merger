@@ -3,11 +3,11 @@
 #include "index_html.h"
 
 const char* ssid = "MicroTik6_2GHz";
-const char* psk = "rasp1234rasp";
+const char* psk = "pwd";
 const char* ap_ssid = "MomClickHereForInternet";
-const char* ap_psk = "iusearchbtw";
+const char* ap_psk = "ap_pwd";
 
-#define AP_MODE
+//#define AP_MODE
 ESP8266WebServer server(80);
 
 #define LED1 D4
@@ -29,8 +29,8 @@ void setup() {
   // Starting Entrypoint
   #ifdef AP_MODE
     Serial.println("Starting in AP Mode");
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(ap_ssid, ap_psk);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(ap_ssid, ap_psk);
   #else
     Serial.println("Starting in STA Mode");
     WiFi.mode(WIFI_STA);
@@ -88,7 +88,7 @@ void loop() {
 
 void flicker(){
   int led = random(0,4);
-  if (ledStates[led] == true){
+  if ledStates[led] == true{
     int chance = random(0,10);
     if (chance > 7 || millis() > 200 && chance > 3){
       int brightness = random(50, 255);

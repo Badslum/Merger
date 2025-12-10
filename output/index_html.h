@@ -94,16 +94,16 @@ function lightcandles() {
         const led = document.getElementById(id);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            fetch(`/toggle?led=&state=`);
+            fetch(`/toggle?led=&state=${led.classList.contains('lit')}`);
         });
     })
     // sync from board
     fetch('/state').then(r => r.json()).then(states => {
-        ids.forEach((id, i) => {
-          const btn = document.getElementById(id);
-          if (states[i]) btn.classList.add('lit'); else btn.classList.remove('lit');
-        });
-      });
+    leds.forEach((id, i) => {
+      const led = document.getElementById(id);
+      if (states[i]) led.classList.add('lit'); else led.classList.remove('lit');
+    });
+});
 }
 document.addEventListener('DOMContentLoaded', () => {
     lightcandles();
