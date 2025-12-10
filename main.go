@@ -114,6 +114,6 @@ func main() {
 		cpp = []byte(replaced)
 		os.WriteFile("output/main.cpp", cpp, 0644)
 	}
-	header := fmt.Sprintf(`const char MAIN_page[] PROGMEM = R"rawliteral(%s)rawliteral";`, merged)
+	header := `const char MAIN_page[] PROGMEM = R"rawliteral(` + merged + `)rawliteral";`
 	os.WriteFile("output/index_html.h", []byte(header), 0644)
 }
