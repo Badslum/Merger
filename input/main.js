@@ -29,13 +29,13 @@ function lightcandles() {
     fetch(`/toggle?led=led${i+1}&state=true`);
     }
     // Toggle LEDs
-    leds.forEach(id => {
+    leds.forEach(function(id) {
         const led = document.getElementById(id);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
             fetch(`/toggle?led=${id}&state=${led.classList.contains('lit')}`);
         });
-    })
+    });
     // sync from board
     fetch('/state').then(r => r.json()).then(states => {
     leds.forEach((id, i) => {
