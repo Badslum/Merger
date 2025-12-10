@@ -3,7 +3,7 @@ function getDate() {
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     dateElement.textContent = today.toLocaleDateString('de-DE', options);
-    if (today.getDate() === 24 && today.getMonth() === 11) {
+    if (today.getDate() >= 24 && today.getMonth() === 11) {
         document.querySelector('h1').textContent = "Fr&ouml;hliche Weihnachten!";
     }
     return today;
@@ -23,6 +23,9 @@ function lightcandles() {
     const start = getFirstAdvent(today.getFullYear());
     const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
     const candles = Math.min(4, Math.floor(diff/7) +1);
+    if (candles > 0 && today.getDate() <= 24) {
+        document.querySelector('h1').textContent = "Fr&ouml;hlichen " + candles + ". Advent!";
+    } 
     // Auto toggle
     for (let i = 0; i < candles; i++) {
     document.getElementById(`led${i+1}`).classList.add('lit');

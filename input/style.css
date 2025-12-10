@@ -1,3 +1,7 @@
+*{
+  display: flex;
+}
+
 body {
   background-color: #121212;
   color: #f0f0f0;
