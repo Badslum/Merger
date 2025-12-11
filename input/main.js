@@ -5,7 +5,7 @@ function getDate() {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     dateElement.textContent = today.toLocaleDateString('de-DE', options);
     if (today.getDate() >= 24 && today.getMonth() === 11) {
-        document.querySelector('h1').textContent = "Fr&ouml;hliche Weihnachten!";
+        document.querySelector('h1').textContent = "Fröhliche Weihnachten!";
     }
     return today;
 }
@@ -28,7 +28,7 @@ function lightcandles() {
     const candles = Math.min(4, Math.floor(diff/7) +1);
     // Updating header to include the current Advent week
     if (candles > 0 && today.getDate() <= 24) {
-        document.querySelector('h1').textContent = "Fr&ouml;hlichen " + candles + ". Advent!";
+        document.querySelector('h1').textContent = "Fröhlichen " + candles + ". Advent!";
     } 
     // Auto toggle candles
     for (let i = 0; i < candles; i++) {
@@ -40,7 +40,8 @@ function lightcandles() {
         const led = document.getElementById(i);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            fetch(`/toggle?led=${i}&state=${led.classList.contains('lit')}`);
+            i--;
+            fetch(`/toggle?led=${i+1}&state=${led.classList.contains('lit')}`);
         });
     });
     // sync led states from board
