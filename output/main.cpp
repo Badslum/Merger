@@ -90,7 +90,7 @@ void loop() {
 // Function to create flickering effect
 void flicker(){
   int led = random(0,4);
-  if ledStates[led] == true{
+  if (ledStates[led] == true){
     int chance = random(0,10);
     if (chance > 7 || millis() > 200 && chance > 3){
       int brightness = random(50, 255);
