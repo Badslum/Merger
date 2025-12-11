@@ -32,24 +32,24 @@ function lightcandles() {
     } 
     // Auto toggle candles
     for (let i = 0; i < candles; i++) {
-    document.getElementById(`led${i+1}`).classList.add('lit');
-    fetch(`/toggle?led=led${i+1}&state=true`);
+        document.getElementById(`led${i+1}`).classList.add('lit');
+        fetch(`/toggle?led=led${i+1}&state=true`);
     }
     // Manual toggle candles
-    leds.forEach(function(id) {
-        const led = document.getElementById(id);
+    leds.forEach(function(i) {
+        const led = document.getElementById(i);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            fetch(`/toggle?led=${id}&state=${led.classList.contains('lit')}`);
+            fetch(`/toggle?led=${i}&state=${led.classList.contains('lit')}`);
         });
     });
     // sync led states from board
     fetch('/state').then(r => r.json()).then(states => {
     leds.forEach((id, i) => {
-      const led = document.getElementById(id);
-      if (states[i]) led.classList.add('lit'); else led.classList.remove('lit');
+        const led = document.getElementById(id);
+        if (states[i]) led.classList.add('lit'); else led.classList.remove('lit');
     });
-});
+})
 }
 // Initialize when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
