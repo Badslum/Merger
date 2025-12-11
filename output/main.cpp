@@ -10,6 +10,7 @@ const char* ap_psk = "ap_pwd";
 //#define AP_MODE
 ESP8266WebServer server(80);
 
+// Registering LED pins and states
 #define LED1 D4
 #define LED2 D3
 #define LED3 D2
@@ -18,6 +19,7 @@ ESP8266WebServer server(80);
 int ledPins[] = {D4, D3, D2, D1};
 bool ledStates[] = {false, false, false, false};
 
+// Setting up WiFi and server
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -25,7 +27,6 @@ void setup() {
     pinMode(ledPins[i], OUTPUT);
     digitalWrite(ledPins[i], LOW);
   }
-
   // Starting Entrypoint
   #ifdef AP_MODE
     Serial.println("Starting in AP Mode");
@@ -41,25 +42,24 @@ void setup() {
   delay(300);
   Serial.print("AP IP: ");
   Serial.println(WiFi.softAPIP());
-
-  // Root page
+  // Load index page on root
   server.on("/", []() {
     server.send_P(200, "text/html", MAIN_page);
   });
-  // Toggle LED endpoint
+  // Load '/toggle' endpoint for toggling LEDs
   server.on("/toggle", []() {
     if (!server.hasArg("led") || !server.hasArg("state")) {
       server.send(400, "text/plain", "Missing led/state");
       return;
     }
-    // Define LED ID and state, then parsing values from frontend
+    // Defining LED IDs and states, then parsing values from frontend
     String ledId = server.arg("led");
     String state = server.arg("state");
-    int index = ledId.substring(3).toInt() - 1;
-    if (index >= 0 && index < 4) {
-      bool on = (state == "true");
-      ledStates[index] = on;
-      digitalWrite(ledPins[index], on ? HIGH : LOW);
+    int i = ledId.substring(3).toInt() -1; // Getting LED index and adjusting for 0-based array 
+    if (i >= 0 && i < 4) {
+      bool on = (state == "true"); // Parsing state
+      ledStates[i] = on;
+      digitalWrite(ledPins[i], on ? HIGH : LOW);
       Serial.printf("Set %s -> %s\n", ledId.c_str(), on ? "ON" : "OFF");
       server.send(200, "text/plain", String(on ? "1" : "0"));
     } else {
@@ -67,7 +67,7 @@ void setup() {
     }
   });
 
-    // Get LED states endpoint
+  // Load '/state' endpoint to get current LED states
   server.on("/state", []() {
     String json = "[";
     for (int i = 0; i < 4; i++) {
@@ -81,11 +81,13 @@ void setup() {
   Serial.println("HTTP Server started");
 }
 
+// Main loop to handle client requests and flicker effect
 void loop() {
   server.handleClient();
   flicker();
 }
 
+// Function to create flickering effect
 void flicker(){
   int led = random(0,4);
   if ledStates[led] == true{
