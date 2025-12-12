@@ -7,7 +7,6 @@ const char MAIN_page[] PROGMEM = R"rawliteral(<html>
     <style>
 /* General Style */
 *{
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -26,6 +25,45 @@ body {
 
 h1 {
     color: gold;
+}
+
+/* Div Styles */
+.header {
+  display: flex;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  height: 20%;
+  width: 100;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.advent-wreath{
+  display: flex;
+  position: fixed;
+  top: 20%;
+  left: 0%;
+  height: 80%;
+  width: 100%;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.date-box {
+  display: flex;
+  position: fixed;
+  top: 20%;
+  right: 0%;
+  height: 20%;
+  width: auto;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Button Styles */
@@ -52,44 +90,6 @@ button.lit {
 
 button.lit:hover {
   background-color: #ffd700;
-}
-
-/* Div Styles */
-.header {
-  display: flex;
-  position: fixed;
-  top: 0%;
-  left: 0%;
-  height: 20%;
-  width: 100;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  text-align: center;
-}
-.advent-wreath{
-  display: flex;
-  position: fixed;
-  top: 20%;
-  left: 0%;
-  height: 80%;
-  width: 100%;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.date-box {
-  display: flex;
-  position: fixed;
-  top: 20%;
-  right: 0%;
-  height: 20%;
-  width: auto;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 }
 </style>
     <script>
@@ -135,8 +135,7 @@ function lightcandles() {
         const led = document.getElementById(i);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            i--;
-            fetch(`/toggle?led=${i+1}&state=${led.classList.contains('lit')}`);
+            fetch(`/toggle?led=${i+0}&state=${led.classList.contains('lit')}`);
         });
     });
     // sync led states from board

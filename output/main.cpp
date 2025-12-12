@@ -3,9 +3,9 @@
 #include "index_html.h"
 
 const char* ssid = "MicroTik6_2GHz";
-const char* psk = "pwd";
+const char* psk = "rasp1234rasp";
 const char* ap_ssid = "MomClickHereForInternet";
-const char* ap_psk = "ap_pwd";
+const char* ap_psk = "iusearchbtw";
 
 //#define AP_MODE
 ESP8266WebServer server(80);
@@ -93,7 +93,7 @@ void flicker(){
   int chance = random(0,10);
   if (chance > 7 || millis() > 200 && chance > 3){
     if (ledStates[led] == true){
-      int brightness = random(50, 255);
+      int brightness = random(20, 255);
       analogWrite(ledPins[led], brightness);
     }
   }
