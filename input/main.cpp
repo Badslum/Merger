@@ -7,7 +7,7 @@ const char* psk = "pwd";
 const char* ap_ssid = "MomClickHereForInternet";
 const char* ap_psk = "ap_pwd";
 
-//#define AP_MODE
+#define AP_MODE
 ESP8266WebServer server(80);
 
 // Registering LED pins and states
@@ -32,6 +32,9 @@ void setup() {
     Serial.println("Starting in AP Mode");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ap_ssid, ap_psk);
+    delay(300);
+    Serial.print("AP IP: ");
+    Serial.println(WiFi.softAPIP());
   #else
     Serial.println("Starting in STA Mode");
     WiFi.mode(WIFI_STA);
@@ -39,9 +42,6 @@ void setup() {
     while (WiFi.status() != WL_CONNECTED) delay(500);
     Serial.println("Connected! IP: %v", WiFi.localIP());
   #endif
-  delay(300);
-  Serial.print("AP IP: ");
-  Serial.println(WiFi.softAPIP());
   // Load index page on root
   server.on("/", []() {
     server.send_P(200, "text/html", MAIN_page);

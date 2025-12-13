@@ -3,9 +3,9 @@
 #include "index_html.h"
 
 const char* ssid = "MicroTik6_2GHz";
-const char* psk = "rasp1234rasp";
+const char* psk = "pwd";
 const char* ap_ssid = "MomClickHereForInternet";
-const char* ap_psk = "iusearchbtw";
+const char* ap_psk = "ap_pwd";
 
 //#define AP_MODE
 ESP8266WebServer server(80);
