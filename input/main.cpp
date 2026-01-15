@@ -90,8 +90,8 @@ void loop() {
 // Function to create flickering effect
 void flicker(){
   int led = random(0,4);
-  int chance = random(0,10);
-  if (chance > 7 || millis() > 200 && chance > 3){
+  int chance = random(0,100);
+  if (chance > 70 || millis()%500 > 200 && chance > 30){
     if (ledStates[led] == true){
       int brightness = random(20, 255);
       analogWrite(ledPins[led], brightness);

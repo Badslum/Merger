@@ -169,7 +169,7 @@ function lightcandles() {
         const led = document.getElementById(i);
         led.addEventListener('click', () => {
             led.classList.toggle('lit');
-            fetch(`/toggle?led=${i+0}&state=${led.classList.contains('lit')}`);
+            fetch(`/toggle?led=&state=${led.classList.contains('lit')}`);
         });
     });
     // sync led states from board
