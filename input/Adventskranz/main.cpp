@@ -39,8 +39,12 @@ void setup() {
     Serial.println("Starting in STA Mode");
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, psk);
-    while (WiFi.status() != WL_CONNECTED) delay(500);
-    Serial.println("Connected! IP: %v", WiFi.localIP());
+    while (WiFi.status() != WL_CONNECTED){
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.print("Connected! IP:");
+    Serial.println(WiFi.localIP()):
   #endif
   // Load index page on root
   server.on("/", []() {

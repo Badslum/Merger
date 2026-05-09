@@ -61,6 +61,7 @@ func main() {
 	}
 	if _, err := os.ReadDir("output"); err != nil {
 		os.MkdirAll("output", os.ModePerm)
+		fmt.Println(err)
 		err = nil
 	}
 	for _, s := range content {
