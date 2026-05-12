@@ -62,24 +62,52 @@ void setup(){
             Serial.print(".");
         }
         Serial.print("Connected! IP:");
-        Serial.println(WiFi.localIP()):
+        Serial.println(WiFi.localIP());
     #endif
     server.on("/", [](){
         server.send_P(200,"text/html", MAIN_page);
     });
     server.on("/data", [](){
+        char lux[32];
+        snprintf(lux, sizeof(lux), "\"lux\":%d", current.lux);
+        Serial.println(lux);
+
+        char temp[32];
+        snprintf(temp, sizeof(temp), "\"temp\":%.1f", current.temp);
+        Serial.println(temp);
+
+        char dp[32];
+        snprintf(dp, sizeof(dp), "\"dp\":%.1f", current.dewPoint());
+        Serial.println(dp);
+
+        char hum[32];
+        snprintf(hum, sizeof(hum), "\"hum\":%.0f", current.hum);
+        Serial.println(hum);
+
+        char absHum[32];
+        snprintf(absHum, sizeof(absHum), "\"absHum\":%.2f", current.absHum());
+        Serial.println(absHum);
+
+        char pres[32];
+        snprintf(pres, sizeof(pres), "\"pres\":%.1f", current.pres);
+        Serial.println(pres);
+
+        char wb[32];
+        snprintf(wb, sizeof(wb), "\"wb\":%.1f", current.wetBulb());
+        Serial.println(wb);
+        
+        char data[256];
+        snprintf(
+            data, sizeof(data),
+            "{%s,%s,%s,%s,%s,%s,%s}",
+            lux, temp, dp, hum, absHum, pres, wb
+        );
+
         server.sendHeader("Cache-Control", "no-cache");
-        String data = String("{")
-            + "\"temp\":"+ current.temp
-            + ",\"hum\":"+ current.hum
-            + ",\"pres\":"+ current.pres
-            + ",\"lux\":"+ current.lux
-            + "}";
         server.send(200,"application/json", data);
-        Serial.println(data);
     });
     server.onNotFound([](){
-        server.send(404,"text/plain","Resource not found")
+        server.send(404,"text/plain","Resource not found");
     });
     Serial.println("Starting Server");
     server.begin();
