@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <title>Weatherstation</title>
+        <meta charset="utf-8">
+        <meta http-equiv="cache-control" content="no-store">
+        <meta name="author" content="Bastian Roth">
+        <meta name="date" content="10.05.2026">
+        <link rel="stylesheet" href="style.css">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <svg id="back"
+            viewBox="0 0 256 144"
+            preserveAspectRatio="xMidYMid slice">
+            
+            <g id="day-sky">
+                <rect width="256"
+                    height="144"
+                    fill="#87cefa"
+                />
+                <g id="sun">
+                    <circle cx="220"
+                        cy="25"
+                        r="14"
+                        fill="#ffd93d"
+                    />
+                </g>
+                <g id="clouds">
+                </g>
+            </g>
+
+            <g id="night-sky">
+                <rect width="256"
+                    height="144"
+                    fill="#050816"
+                />
+                <g id="stars">
+                    
+                </g>
+                <g id="moon">
+                    <circle cx="220"
+                        cy="25"
+                        r="10"
+                        fill="#cdd6f4"
+                    />
+                    <circle cx="215"
+                        cy="25"
+                        r="9"
+                        fill="#050816"
+                    />
+                </g>
+            </g>
+
+        </svg>
+        <div id="headerbar">
+            <h1 id="title">
+                Weatherstation
+            </h1>
+        </div>
+        <section id="weather-report"
+            class="weather">
+
+            <h2 id="report-title">
+                Current Metrics
+            </h2>
+
+            <div id="grid">
+                <!-- Temperature -->
+                <div class="metric">
+                    <span class="label">
+                        Temperature
+                    </span>
+                    <meter id="temp-meter"
+                        min="-20"
+                        max="50">
+                    </meter>
+                    <span id="temp-value">
+                    </span>
+                </div>
+
+                <!-- Dewpoint -->
+                <div class="metric">
+                    <span class="label">
+                        Dewpoint
+                    </span>
+                    <meter id="dp-meter"
+                        min="-20"
+                        max="50">
+                    </meter>
+                    <span id="dp-value">
+                    </span>
+                </div>
+
+                <!-- Humidity -->
+                <div class="metric">
+                    <span class="label">
+                        Humidity
+                    </span>
+                    <meter id="hum-meter"
+                        min="0"
+                        max="100">
+                    </meter>
+                    <span id="hum-value">
+                    </span>
+                </div>
+
+                <!-- Absolute humidity -->
+                <div class="metric">
+                    <span class="label">
+                        Absolute humidity
+                    </span>
+                    <meter id="absHum-meter"
+                        min="0"
+                        max="50">
+                    </meter>
+                    <span id="absHum-value">
+                    </span>
+                </div>
+
+                <!-- Pressure -->
+                <div class="metric">
+                    <span class="label">
+                        Pressure
+                    </span>
+                    <meter id="pres-meter"
+                        min="900"
+                        max="1100">
+                    </meter>
+                    <span id="pres-value">
+                    </span>
+                </div>
+
+                <!-- Wetbulb -->
+                <div class="metric">
+                    <span class="label">
+                        Wetbulb
+                    </span>
+                    <meter id="wb-meter"
+                        min="-20"
+                        max="50">
+                    </meter>
+                    <span id="wb-value">
+                    </span>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

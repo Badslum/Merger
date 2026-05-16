@@ -1,0 +1,111 @@
+/* Backgroung and animation */
+#back {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+
+.cloud {
+    animation: drift 60s linear infinite;
+    opacity: 0.4;
+}
+
+@keyframes drift {
+    from { transform: translateX(120%); }
+    to   { transform: translateX(-150%); }
+}
+
+/* headerbar */
+.headerbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d0d0d;
+    border-bottom: 2px solid #333;
+}
+
+h1 {
+    color: #050816;
+    font-family: "Press Start 2P", monospace;
+    font-size: 48px;
+    text-align: center;
+    margin: 0;
+}
+
+#night h1, h2, .metric, .metric .value{
+    color: lightskyblue;
+}
+
+#day h1, h2, .metric, .metric .value{
+    color: #050816;
+}
+
+/* Weather report */
+h2 {
+    color: #050816;
+    font-family: "Press Start 2P", monospace;
+    font-size: 24px;
+    text-align: center;
+    margin-top: 20vh;
+    margin-bottom: 20px;
+}
+
+#grid {
+    position: relative;
+    width: 90%;
+    height: 60%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* Metrics */
+.metric {
+    background: transparent;
+    border: 2px solid #050816;
+    padding: 30px;
+    border-radius: 4px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    color: #050816;
+    height: 50%;
+}
+
+.metric .label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.metric meter {
+    width: 100%;
+    height: 15px;
+    margin: 6px 0;
+    border: 1px solid #555;
+}
+
+.metric .value {
+    display: block;
+    margin-top: 4px;
+    color: #050816;
+}
+
+/*Media width*/
+@media (max-width: 900px) {
+    #weather-report {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    #weather-report {
+        grid-template-columns: 1fr;
+    }
+}
