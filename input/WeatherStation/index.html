@@ -14,10 +14,27 @@
             preserveAspectRatio="xMidYMid slice">
             
             <g id="day-sky">
-                <rect width="256"
-                    height="144"
-                    fill="#87cefa"
-                />
+                <defs>
+                    <linearGradient id="daySkyGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1">
+                        <stop offset="0%"
+                            stop-color="lightskyblue"
+                        />
+                        <stop offset="100%"
+                            stop-color="#2554ca"
+                        />
+                    </linearGradient>
+                </defs>
+
+                <rect x="0"
+                    y="0"
+                    width="100%"
+                    height="100%"
+                    fill="url(#daySkyGradient)" />
+
                 <g id="sun">
                     <circle cx="220"
                         cy="25"
@@ -26,6 +43,11 @@
                     />
                 </g>
                 <g id="clouds">
+                    <g id="clouds-a">
+                    </g>
+                    <g id="clouds-b"
+                        transform="translate(256,0)">
+                    </g>
                 </g>
             </g>
 
@@ -50,13 +72,14 @@
                     />
                 </g>
             </g>
-
         </svg>
+
         <div id="headerbar">
             <h1 id="title">
                 Weatherstation
             </h1>
         </div>
+        
         <section id="weather-report"
             class="weather">
 

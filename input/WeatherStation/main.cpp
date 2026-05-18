@@ -50,7 +50,7 @@ void setup(){
         Serial.println("Starting in AP Mode");
         WiFi.mode(WIFI_AP);
         WiFi.softAP(ap_ssid, ap_psk);
-    delay(300);
+        delay(300);
         Serial.print("AP IP: ");
         Serial.println(WiFi.softAPIP());
     #else
@@ -151,7 +151,7 @@ void readBMP() {
     float p = bmp.readPressure();
 
     if (isnan(p)) {
-        Serial.println("BMP280 read failed");
+        Serial.println("BMP280 value malformed");
         return;
     }
 
