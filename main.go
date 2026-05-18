@@ -66,11 +66,11 @@ func main() {
 
 	switch {
 	case hasFiles:
-		fmt.Println("Processing single project:", input)
+		fmt.Printf("[1] Processing single project: %s", input)
 		processProject(input, output)
 
 	case hasDirs:
-		fmt.Println("Processing multiple projects in:", input)
+		fmt.Printf("[%d] Processing multiple projects in: %s", len(entries), input)
 		for _, e := range entries {
 			if e.IsDir() {
 				projectName := e.Name()
@@ -81,7 +81,7 @@ func main() {
 		}
 
 	default:
-		panic("Input directory is empty")
+		panic("[0] Input directory is empty")
 	}
 }
 
