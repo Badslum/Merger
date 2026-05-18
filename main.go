@@ -137,9 +137,10 @@ func processProject(inPath, outPath string) {
 	}
 
 	if js != nil {
+		safeJS := strings.ReplaceAll(string(js), "$", "$$")
 		reJS := regexp.MustCompile(`<script[^>]*src="main.js"[^>]*></script>`)
 		merged = reJS.ReplaceAllString(merged,
-			"<script>\n"+strings.TrimSpace(string(js))+"\n</script>")
+			"<script>\n"+strings.TrimSpace(string(safeJS))+"\n</script>")
 	}
 
 	if cpp != nil {
