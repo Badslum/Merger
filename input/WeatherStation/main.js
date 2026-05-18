@@ -36,13 +36,13 @@ function updateUI(data) {
     document.getElementById("wb-meter").value = data.wb;
     document.getElementById("wb-value").textContent = data.wb.toFixed(1);
 
-    updateSky(data.lux ?? 1000);
+    updateSky(data.lux ?? undefined);
 }
 
 function updateSky(lux) {
     const day = document.getElementById("day-sky");
     const night = document.getElementById("night-sky");
-    if (lux > 500 || lux === undefined) {
+    if (lux > 150 || lux === undefined) {
         document.body.classList.remove("night");
         day.style.display = "block";
         night.style.display = "none";

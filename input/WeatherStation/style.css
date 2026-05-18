@@ -11,6 +11,10 @@ body{
     z-index: -2;
 }
 
+#night-sky{
+    display: none;
+}
+
 #clouds {
     animation: drift 90s linear infinite;
     transform-box: fill-box;

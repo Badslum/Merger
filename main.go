@@ -66,11 +66,11 @@ func main() {
 
 	switch {
 	case hasFiles:
-		fmt.Printf("[1] Processing single project: %s", input)
+		fmt.Printf("[1] Processing single project: %s \n", input)
 		processProject(input, output)
 
 	case hasDirs:
-		fmt.Printf("[%d] Processing multiple projects in: %s", len(entries), input)
+		fmt.Printf("[%d] Processing multiple projects in: %s \n", len(entries), input)
 		for _, e := range entries {
 			if e.IsDir() {
 				projectName := e.Name()
@@ -86,7 +86,7 @@ func main() {
 }
 
 func processProject(inPath, outPath string) {
-	fmt.Printf("[x] Project: %s -> %s\n", inPath, outPath)
+	fmt.Printf("[x] Project: %s -> %s \n", inPath, outPath)
 	os.MkdirAll(outPath, os.ModePerm)
 
 	var cpp, html, css, js []byte
@@ -144,7 +144,7 @@ func processProject(inPath, outPath string) {
 	}
 
 	if cpp != nil {
-		os.WriteFile(filepath.Join(outPath, "main.cpp"), cpp, 0644)
+		os.WriteFile(filepath.Join(outPath, "main.ino"), cpp, 0644)
 	}
 
 	header := `const char MAIN_page[] PROGMEM = R"rawliteral(` + merged + `)rawliteral";`

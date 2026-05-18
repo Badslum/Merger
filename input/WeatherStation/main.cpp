@@ -15,12 +15,14 @@ ESP8266WebServer server(80);
 
 #define TICK 1000
 
-#define LDR A0
-#define DHTPIN D1
-#define DHTTYPE DHT11
-#define OLED_SCL GPIO5
-#define OLED_SDA GPIO4
-#define OLED_RESET 0
+#define LDR         A0
+#define BMP_SCL     D1
+#define OLED_SCL    D1
+#define BMP_SDA     D2
+#define OLED_SDA    D2 
+#define DHTPIN      D5
+#define DHTTYPE     DHT11
+#define OLED_RESET  0
 
 DHT dht(DHTPIN, DHTTYPE);
 Adafruit_BMP280 bmp;
@@ -32,13 +34,31 @@ struct Weather{
     float hum;
     float pres;
     float dewPoint() const {
-        return temp - ((100 - hum) / 5.0);
+        const float a = 17.62f;
+        const float b = 243.12f;
+
+        float rh = hum / 100.0f;
+        float gamma = (a * temp) / (b + temp) + log(rh);
+
+        return (b * gamma) / (a - gamma);
     }
+
     float absHum() const {
-        return (hum / 100.0f) * (temp + 5.0f);
+        float rh = hum / 100.0f;
+        float es = 6.112f * exp((17.67f * temp) / (temp + 243.5f));
+        float e  = rh * es;
+
+        return (2.1674f * e) / (273.15f + temp);
     }
+
     float wetBulb() const {
-        return temp * atan(0.02f * hum) + (hum / 100.0f);
+        float rh = hum;
+
+        return temp * atan(0.151977f * sqrtf(rh + 8.313659f))
+             + atan(temp + rh)
+             - atan(rh - 1.676331f)
+             + 0.00391838f * powf(rh, 1.5f) * atan(0.023101f * rh)
+             - 4.686035f;
     }
 };
 Weather current;
@@ -109,14 +129,26 @@ void setup(){
     server.onNotFound([](){
         server.send(404,"text/plain","Resource not found");
     });
+    
     Serial.println("Starting Server");
     server.begin();
+    
     Serial.println("Starting DHT11");
     dht.begin();
-    Serial.println("Starting BMP");
-    bmp.begin(0x76);
+    
+    Serial.println("Starting bmp");
+    if (!bmp.begin(0x76)) {
+        Serial.println("BMP280 setup failed");
+    } else {
+        Serial.println("BMP280 ready");
+    }
+
     Serial.println("Starting OLED Display");
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)){
+        Serial.println("OLED setup failed");
+    } else {
+        Serial.println("OLED ready");
+    }
 }
 
 void loop(){
@@ -140,6 +172,7 @@ void readDHT() {
 
     if (isnan(t) || isnan(h)) {
         Serial.println("DHT values malformed");
+        Serial.println(t,h);
         return;
     }
 
@@ -151,7 +184,8 @@ void readBMP() {
     float p = bmp.readPressure();
 
     if (isnan(p)) {
-        Serial.println("BMP280 value malformed");
+        Serial.println("bmp280 value malformed");
+        Serial.println(p);
         return;
     }
 
