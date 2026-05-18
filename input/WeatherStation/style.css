@@ -11,9 +11,6 @@ body{
     z-index: -2;
 }
 
-#night-sky {
-    display: none;
-}
 
 #clouds {
     animation: drift 90s linear infinite;
@@ -47,13 +44,13 @@ h1 {
 }
 
 body.day {
-    color: darkblue;
-    border: darkblue;
+    color: #04044e;
+    border: #04044e;
 }
 
 body.night {
-    color: lightskyblue;
-    border: lightskyblue;
+    color: #87cefa;
+    border: #87cefa;
 }
 
 /* Weather report */
