@@ -1,23 +1,42 @@
-async function getData() {
-    try {
-        const resp = await fetch("/data");
-        if (!resp.ok) {
-            console.log("HTTP", resp.status);
-            return;
+document.getElementById("nav-report").addEventListener('click',() => {
+    console.log("REPORT CLICK");
+    document.getElementById("weather-report").hidden = false;
+    document.getElementById("weather-trend").hidden = true;
+    startPolling("/data",updateMeters,2000);
+});
+
+document.getElementById("nav-trend").addEventListener('click', () => {
+    document.getElementById("weather-report").hidden = true;
+    document.getElementById("weather-trend").hidden = false;
+    startPolling("/trend",updateTrend,5000);
+});
+
+let poller = null;
+function startPolling(endpoint = "/data", handler=updateMeters, interval=2000) {
+    stopPolling();
+    poller = setInterval(async () => {
+        try {
+            const resp = await fetch(endpoint);
+            if (!resp.ok) {
+                console.log("HTTP", resp.status);
+                return;
+            }
+            const data = await resp.json();
+            handler(data);
+        } catch (ex) {
+            console.log("Fetch error:", ex);
         }
-        const data = await resp.json();
-        if (data) {
-            updateUI(data);
-        }
-        return;
-    } catch (ex) {
-        console.log("Fetch error:", ex);
-        updateSky(undefined);
-        return;
+    }, interval);
+}
+
+function stopPolling() {
+    if (poller !== null) {
+        clearInterval(poller);
+        poller = null;
     }
 }
 
-function updateUI(data) {
+function updateMeters(data) {
     document.getElementById("temp-meter").value = data.temp;
     document.getElementById("temp-value").textContent = data.temp.toFixed(1);
 
@@ -42,7 +61,7 @@ function updateUI(data) {
 function updateSky(lux) {
     const day = document.getElementById("day-sky");
     const night = document.getElementById("night-sky");
-    if (lux > 150 || lux === undefined) {
+    if (lux > 320 || lux === undefined) {
         document.body.classList.remove("night");
         day.style.display = "block";
         night.style.display = "none";
@@ -55,6 +74,39 @@ function updateSky(lux) {
     }
 }
 
+function updateTrend(data) {
+    const values = data.values;
+
+    if (!values || values.length === 0) return;
+
+    const maxTemp = Math.max(...values.map(v => v[1]));
+    const minTemp = Math.min(...values.map(v => v[1]));
+
+    const maxHum = Math.max(...values.map(v => v[2]));
+    const minHum = Math.min(...values.map(v => v[2]));
+
+    const tempPoints = [];
+    const humPoints = [];
+
+    const w = 300;
+    const h = 150;
+
+    for (let i = 0; i < values.length; i++) {
+        const x = (i / (values.length - 1)) * w;
+
+        const t = values[i][1];
+        const yT = h - ((t - minTemp) / (maxTemp - minTemp)) * h;
+        tempPoints.push(`${x},${yT}`);
+
+        const hVal = values[i][2];
+        const yH = h - ((hVal - minHum) / (maxHum - minHum)) * h;
+        humPoints.push(`${x},${yH}`);
+    }
+
+    document.getElementById("trend-temp").setAttribute("points", tempPoints.join(" "));
+    document.getElementById("trend-hum").setAttribute("points", humPoints.join(" "));
+}
+
 function spawnSun() {
     const svgNS = "http://www.w3.org/2000/svg";
     const sun = document.getElementById("sun");
@@ -65,13 +117,8 @@ function spawnSun() {
     for (let y = -r; y <= r; y++) {
         for (let x = -r; x <= r; x++) {
             if (x*x + y*y <= r*r) {
-                const rect = document.createElementNS(svgNS, "rect");
-                rect.setAttribute("x", cx + x);
-                rect.setAttribute("y", cy + y);
-                rect.setAttribute("width", 1);
-                rect.setAttribute("height", 1);
-                rect.setAttribute("fill", "#f3eb1f");
-                sun.appendChild(rect);
+                const e = makeRect("sun",cx+x,cy+y)
+                sun.appendChild(e);
             }
         }
     }
@@ -130,20 +177,12 @@ function createCloud(posX, posY) {
             if (Math.random() < 0.25) continue;
 
             grid[x][y] = 1;
-            const rect = document.createElementNS(svgNS, "rect");
-
             const level = 1 + Math.floor(Math.random() * 5);
             const opacity = 0.25 + level * 0.15;
-
-            rect.setAttribute("x", y);
-            rect.setAttribute("y", x);
-            rect.setAttribute("width", 1);
-            rect.setAttribute("height", 1);
-            rect.setAttribute("fill", `rgba(255,255,255,${opacity})`);
-
-            cloud.appendChild(rect);
+            const e = makeRect("cloud",y,x,`rgba(255,255,255,${opacity})`);
+            
+            cloud.appendChild(e);
             queue.push([x,y]);
-
             filled++;
         }
     }
@@ -167,7 +206,6 @@ function spawnMoon() {
             const inner = (sx*sx + y*y <= rInner*rInner);
 
             if (outer) {
-                const rect = document.createElementNS(svgNS, "rect");
                 let color = "#04044e";
                 if (!inner) {
                     color = "#cad4f5";
@@ -177,13 +215,8 @@ function spawnMoon() {
                         color = "#a6adc9";
                     }
                 }
-                
-                rect.setAttribute("x", cx + x);
-                rect.setAttribute("y", cy + y);
-                rect.setAttribute("width", 1);
-                rect.setAttribute("height", 1);
-                rect.setAttribute("fill", color);
-                moon.appendChild(rect);
+                const e = makeRect("moon",cx+x,cy+y,color);
+                moon.appendChild(e);
             }
         }
     }
@@ -196,14 +229,7 @@ function spawnStars(count=128) {
     for (let i = 0; i < count; i++) {
         const x = Math.random() * 256;
         const y = Math.random() * 142;
-
-        const e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        e.setAttribute("class", "star");
-        e.setAttribute("x", x);
-        e.setAttribute("y", y);
-        e.setAttribute("width", 1);
-        e.setAttribute("height", 1);
-        e.setAttribute("fill", "#f3eb1f");
+        const e = makeRect("star",x,y);
         group.appendChild(e);
     }
     initTwinkle()
@@ -229,10 +255,23 @@ function initTwinkle() {
     requestAnimationFrame(animate);
 }
 
+function makeRect(group = "", x = 0, y = 0,color="#f3eb1f", width=1, height=1){
+    const e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    e.setAttribute("class", group);
+    e.setAttribute("x", x);
+    e.setAttribute("y", y);
+    e.setAttribute("width", width);
+    e.setAttribute("height", height);
+    e.setAttribute("fill", color);
+    return e;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("nav-report").click();
+
     spawnSun();
     spawnClouds(32);
+    
     spawnMoon();
     spawnStars(128);
-    setInterval(getData, 1000);
 });

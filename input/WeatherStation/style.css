@@ -4,7 +4,8 @@ body{
 }
 
 #back {
-    position: fixed;
+    pointer-events: none;
+    position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -56,6 +57,12 @@ body.night {
     border: #87cefa;
 }
 
+/* Navbar */
+
+button{
+    z-index: 2;
+}
+
 /* Weather report */
 h2 {
     font-family: "Press Start 2P", monospace;
@@ -104,6 +111,20 @@ h2 {
     display: block;
     margin-top: 4px;
     color: inherit;
+}
+
+/* Trend */
+#trend-container {
+    width: 80%;
+    height: 200px;
+    margin-top: 10px;
+}
+
+#trend-graph {
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 /*Media width*/

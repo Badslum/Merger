@@ -14,6 +14,7 @@ const char* ap_psk = "ap_pwd";
 ESP8266WebServer server(80);
 
 #define TICK 1000
+#define TRDSIZE 20
 
 #define LDR         A0
 #define BMP_SCL     D1
@@ -63,6 +64,15 @@ struct Weather{
 };
 Weather current;
 
+struct Trentry {
+    unsigned long id;
+    float temp;
+    float hum;
+};
+Trentry trend[TRDSIZE];
+int tridx = 0;
+unsigned long trcnt = 0;
+
 void setup(){
     Serial.begin(115200);
     Serial.println();
@@ -85,46 +95,75 @@ void setup(){
         Serial.println(WiFi.localIP());
     #endif
     server.on("/", [](){
+        server.sendHeader("Cache-Control", "no-cache");
         server.send_P(200,"text/html", MAIN_page);
     });
     server.on("/data", [](){
-        char lux[32];
-        snprintf(lux, sizeof(lux), "\"lux\":%d", current.lux);
-        Serial.println(lux);
-
-        char temp[32];
-        snprintf(temp, sizeof(temp), "\"temp\":%.1f", current.temp);
-        Serial.println(temp);
-
-        char dp[32];
-        snprintf(dp, sizeof(dp), "\"dp\":%.1f", current.dewPoint());
-        Serial.println(dp);
-
-        char hum[32];
-        snprintf(hum, sizeof(hum), "\"hum\":%.0f", current.hum);
-        Serial.println(hum);
-
-        char absHum[32];
-        snprintf(absHum, sizeof(absHum), "\"absHum\":%.2f", current.absHum());
-        Serial.println(absHum);
-
-        char pres[32];
-        snprintf(pres, sizeof(pres), "\"pres\":%.1f", current.pres);
-        Serial.println(pres);
-
-        char wb[32];
-        snprintf(wb, sizeof(wb), "\"wb\":%.1f", current.wetBulb());
-        Serial.println(wb);
-        
         char data[256];
-        snprintf(
-            data, sizeof(data),
-            "{%s,%s,%s,%s,%s,%s,%s}",
-            lux, temp, dp, hum, absHum, pres, wb
+        snprintf(data, sizeof(data),"{"
+            "\"lux\":%d,"
+            "\"temp\":%.1f,"
+            "\"dp\":%.1f,"
+            "\"hum\":%.0f,"
+            "\"absHum\":%.2f,"
+            "\"pres\":%.1f,"
+            "\"wb\":%.1f}",
+            current.lux,
+            current.temp,
+            current.dewPoint(),
+            current.hum,
+            current.absHum(),
+            current.pres,
+            current.wetBulb()
+        );
+        server.sendHeader("Cache-Control", "no-cache");
+        server.send(200, "application/json", data);
+    });
+    server.on("/trend", [](){
+        char data[1024];
+        int pos = 0;
+
+        pos += snprintf(data, sizeof(data),"{"
+            "\"latest\":%d,"
+            "\"format\":[\"id\",\"tempC\",\"hum%%\"],"
+            "\"values\":[",
+            TRDSIZE
         );
 
+        for (int i = 0; i < TRDSIZE; i++){
+            int x =(tridx + i) % TRDSIZE;
+            pos += snprintf(data + pos, sizeof(data) - pos,
+                "[%lu,%.1f,%.1f]%s",
+                trend[x].id,
+                trend[x].temp,
+                trend[x].hum,
+                (i < TRDSIZE - 1 ? "," : "")
+            );
+        }
+
+        snprintf(data + pos, sizeof(data) - pos, "]}");
+
         server.sendHeader("Cache-Control", "no-cache");
-        server.send(200,"application/json", data);
+        server.send(200, "application/json", data);
+    });
+    server.on("/info", [](){
+        char data[512];
+        snprintf(data, sizeof(data),"{"
+            "\"device\":\"ESP8266 WeatherStation\","
+            "\"uptime_s\":%lu,"
+            "\"trend_entries\":%d,"
+            "\"trend_interval\":15,"
+            "\"ldr_threshold\":320,"
+            "\"endpoints\":{"
+                "\"/\":\"Frontend UI\","
+                "\"/data\":\"Current Measurements\","
+                "\"/trend\":\"Trend over last 5 minutes\","
+                "\"/info\":\"Metadata\""
+            "}}",
+            millis() / 1000,
+            TRDSIZE
+        );
+        server.send(200, "application/json", data);
     });
     server.onNotFound([](){
         server.send(404,"text/plain","Resource not found");
@@ -156,58 +195,83 @@ void loop(){
     while (millis() < ticker+TICK) {
         server.handleClient();
     }
-    if (ticker/TICK % 4 == 0) readLDR();
-    if (ticker/TICK % 1 == 0) readDHT();
-    if (ticker/TICK % 2 == 0) readBMP();
-    updateDisplay();
+    if (ticker/TICK %  1 == 0) readBMP();
+    if (ticker/TICK %  2 == 0) readDHT();
+    if (ticker/TICK %  4 == 0) readLDR();
+    if (ticker/TICK % 15 == 0) saveTRD();
+    printValues((ticker / 30) % 2);
 }
 
-void readLDR(){
-    current.lux = analogRead(LDR);
+void readBMP() {
+    float p = bmp.readPressure();
+    float t = bmp.readTemperature();
+
+    if (isnan(p) || isnan(t)) {
+        Serial.println("BMP280 values malformed");
+        return;
+    }
+
+    current.pres = p / 100.0f;
+    current.temp = t;
 }
 
 void readDHT() {
     float t = dht.readTemperature();
     float h = dht.readHumidity();
-
+    
     if (isnan(t) || isnan(h)) {
         Serial.println("DHT values malformed");
-        Serial.println(t,h);
         return;
     }
-
+    
     current.temp = t;
     current.hum  = h;
 }
 
-void readBMP() {
-    float p = bmp.readPressure();
-
-    if (isnan(p)) {
-        Serial.println("bmp280 value malformed");
-        Serial.println(p);
-        return;
-    }
-
-    current.pres = p / 100.0f;
+void readLDR(){
+    int lux = analogRead(LDR);
+    current.lux = lux;
+    Serial.printf("L: %d\n", lux);
 }
 
-void updateDisplay(){
+void saveTRD(){
+    trend[tridx].id = trcnt;
+    trend[tridx].temp = current.temp;
+    trend[tridx].hum  = current.hum;
+    trcnt++;
+    tridx = (tridx + 1) % TRDSIZE;
+}
+
+void printValues(int start){
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
 
-    display.setCursor(0, 0);
-    display.printf("T: %.1fC", current.temp);
+    float t = current.temp;
+    display.drawBitmap( 0 + start,  0 + start , ICON_TEMP, 8, 8, WHITE);
+    display.setCursor( 10 + start,  0 + start);
+    display.printf("T: %.1fC", t);
+    Serial.printf("T: %.1fC\n", t);
 
-    display.setCursor(64, 0);
-    display.printf("H: %.0f%%", current.hum);
+    float h = current.hum;
+    display.drawBitmap(64 + start,  0 + start , ICON_HUM,  8, 8, WHITE);
+    display.setCursor( 74 + start,  0 + start);
+    display.printf("H: %.0f%%", h);
+    Serial.printf("H: %.0f%%\n", h);
 
-    display.setCursor(0, 32);
-    display.printf("D: %.1fC", current.dewPoint());
+    float dp = current.dewPoint();
+    display.drawBitmap( 0 + start, 32 + start , ICON_DP,   8, 8, WHITE);
+    display.setCursor( 10 + start, 32 + start);
+    display.printf("D: %.1fC", dp);
+    Serial.printf("D: %.1fC\n", dp);
 
-    display.setCursor(64, 32);
-    display.printf("P: %.0f", current.pres);
+    float p = current.pres;
+    display.drawBitmap(64 + start, 32 + start , ICON_PRES, 8, 8, WHITE);
+    display.setCursor( 74 + start, 32 + start);
+    display.printf("P: %.0f", p);
+    Serial.printf("P: %.0f\n", p);
 
     display.display();
+    Serial.printf("AH: %.1f\n",current.absHum());
+    Serial.printf("WB: %.1f\n", current.wetBulb());
 }

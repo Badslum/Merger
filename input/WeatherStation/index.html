@@ -13,6 +13,7 @@
             viewBox="0 0 256 144"
             preserveAspectRatio="xMidYMid slice">
             
+            <!-- Background during day mode -->
             <g id="day-sky">
                 <defs>
                     <linearGradient id="daySkyGradient"
@@ -46,6 +47,7 @@
                 </g>
             </g>
 
+            <!-- Background during night mode -->
             <g id="night-sky">
                 <rect width="256"
                     height="144"
@@ -65,6 +67,15 @@
             </h1>
         </div>
         
+        <div id="navbar">
+            <button id="nav-report">
+                Current Weather
+            </button>
+            <button id="nav-trend">
+                Weather Trend
+            </button>
+        </div>
+
         <section id="weather-report"
             class="weather">
 
@@ -150,6 +161,45 @@
                     <span id="wb-value">
                     </span>
                 </div>
+            </div>
+        </section>
+
+        <section id="weather-trend"
+            hidden>
+
+            <h2 id="trend-title">
+                Weather Trend
+            </h2>
+
+            <div id="trend-box">
+                <svg id="trend-graph"
+                    viewBox="0 0 300 150"
+                    preserveAspectRatio="none">
+                    <line x1="0"
+                        y1="150"
+                        x2="300"
+                        y2="150"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="150"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <polyline id="trend-temp"
+                        fill="none"
+                        stroke="#ff4444"
+                        stroke-width="2"
+                    />
+                    <polyline id="trend-hum"
+                        fill="none"
+                        stroke="#44aaff"
+                        stroke-width="2"
+                    />
+                </svg>
             </div>
         </section>
     </body>
