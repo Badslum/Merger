@@ -48,7 +48,7 @@ function updateTrend(data) {
         const x = (i / (values.length - 1)) * width;
 
         const temp = values[i][1];
-        const yT = height - ((temp - minTemp) / (maxTemp - minTemp)) * height;
+        const yT = height - ((temp * height) / (maxTemp - minTemp)) - 8;
         tempPoints.push(`${x},${yT}`);
         
         const tpt = makeRect("tp", x, yT, "transparent");
@@ -57,7 +57,7 @@ function updateTrend(data) {
         tooltips.appendChild(tTip);
 
         const hum = values[i][2];
-        const yH = height - ((hum - minHum) / (maxHum - minHum)) * height;
+        const yH = height - ((hum * height) / (maxHum - minHum)) - 8;
         humPoints.push(`${x},${yH}`);
 
         const hpt = makeRect("hp", x, yH, "transparent");
