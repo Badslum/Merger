@@ -8,11 +8,11 @@ document.getElementById("nav-report").addEventListener('click',() => {
 document.getElementById("nav-trend").addEventListener('click', () => {
     document.getElementById("weather-report").hidden = true;
     document.getElementById("weather-trend").hidden = false;
-    startPolling("/trend",updateTrend,5000);
+    startPolling("/trend",updateTrend,15000);
 });
 
 let poller = null;
-function startPolling(endpoint = "/data", handler=updateMeters, interval=2000) {
+function startPolling(endpoint = "/data", fn=updateMeters, interval=2000) {
     stopPolling();
     poller = setInterval(async () => {
         try {
@@ -22,7 +22,7 @@ function startPolling(endpoint = "/data", handler=updateMeters, interval=2000) {
                 return;
             }
             const data = await resp.json();
-            handler(data);
+            fn(data);
         } catch (ex) {
             console.log("Fetch error:", ex);
         }
@@ -34,6 +34,76 @@ function stopPolling() {
         clearInterval(poller);
         poller = null;
     }
+}
+
+function updateTrend(data) {
+    
+    const values = data.values;
+
+    if (!values || values.length === 0) return;
+
+    const maxTemp = 40;
+    const minTemp = -10;
+    const maxHum = 100;
+    const minHum = 0;
+    const width = 128;
+    const height = 32;
+
+    const tempPoints = [];
+    const humPoints = [];
+    const tooltips = document.getElementById("trend-tooltips");
+    tooltips.innerHTML = ""; 
+
+    for (let i = 0; i < values.length; i++){
+        const x = (i / (values.length - 1)) * width;
+
+        const temp = values[i][1];
+        const yT = height - ((temp - tempMin) / (tempMax - tempMin)) * height;
+        tempPoints.push(`${x},${yT}`);
+        
+        const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        tText.setAttribute("x", x + 2);
+        tText.setAttribute("y", yT - 2);
+        tText.setAttribute("font-size", "2");
+        tText.setAttribute("fill", "white");
+        tText.setAttribute("visibility", "hidden");
+        tText.textContent = `${temp}°C`;
+        
+        const tpt = makeRect("tp", x, 0, "transparent");
+        tpt.addEventListener("mouseenter", () => {
+            tpt.setAttribute("fill", "blue");
+            tText.setAttribute("visibility", "visible");
+        });
+        tpt.addEventListener("mouseleave", () => {
+            tpt.setAttribute("fill", "transparent");
+            tText.setAttribute("visibility", "hidden");
+        });
+
+        const hum = values[i][2];
+        const yH = height - ((hum - humMin) / (humMax - humMin)) * height;
+        humPoints.push(`${x},${yH}`);
+
+        const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        tText.setAttribute("x", x + 2);
+        tText.setAttribute("y", yT - 2);
+        tText.setAttribute("font-size", "2");
+        tText.setAttribute("fill", "white");
+        tText.setAttribute("visibility", "hidden");
+        tText.textContent = `${temp}°C`;
+        
+        const hpt = makeRect("hp", x, yH, "transparent");
+        hpt.addEventListener("mouseenter", () => {
+            hpt.setAttribute("fill", "blue");
+            hpt.textContent = `${temp}°C`;
+        });
+        hpt.addEventListener("mouseleave", () => {
+            tpt.setAttribute("fill", "transparent");
+            hpt.textContent = "";
+        });
+    }
+
+    document.getElementById("trend-temp").setAttribute("points", tempPoints.join(" "));
+    document.getElementById("trend-hum").setAttribute("points", humPoints.join(" "));
 }
 
 function updateMeters(data) {
@@ -61,7 +131,7 @@ function updateMeters(data) {
 function updateSky(lux) {
     const day = document.getElementById("day-sky");
     const night = document.getElementById("night-sky");
-    if (lux > 320 || lux === undefined) {
+    if (lux > 480 || lux === undefined) {
         document.body.classList.remove("night");
         day.style.display = "block";
         night.style.display = "none";
@@ -72,39 +142,6 @@ function updateSky(lux) {
         night.style.display = "block";
         document.body.classList.add("night");
     }
-}
-
-function updateTrend(data) {
-    const values = data.values;
-
-    if (!values || values.length === 0) return;
-
-    const maxTemp = Math.max(...values.map(v => v[1]));
-    const minTemp = Math.min(...values.map(v => v[1]));
-
-    const maxHum = Math.max(...values.map(v => v[2]));
-    const minHum = Math.min(...values.map(v => v[2]));
-
-    const tempPoints = [];
-    const humPoints = [];
-
-    const w = 300;
-    const h = 150;
-
-    for (let i = 0; i < values.length; i++) {
-        const x = (i / (values.length - 1)) * w;
-
-        const t = values[i][1];
-        const yT = h - ((t - minTemp) / (maxTemp - minTemp)) * h;
-        tempPoints.push(`${x},${yT}`);
-
-        const hVal = values[i][2];
-        const yH = h - ((hVal - minHum) / (maxHum - minHum)) * h;
-        humPoints.push(`${x},${yH}`);
-    }
-
-    document.getElementById("trend-temp").setAttribute("points", tempPoints.join(" "));
-    document.getElementById("trend-hum").setAttribute("points", humPoints.join(" "));
 }
 
 function spawnSun() {
@@ -159,13 +196,13 @@ function createCloud(posX, posY) {
     const startCol = Math.floor(cols/2);
     const queue = [[startRow, startCol]];
 
-    let targetBlocks = Math.floor((rows * cols) * 0.8);
+    let targetBlocks = Math.floor((rows * cols) * 0.6);
     let filled = 0;
 
     while (queue.length > 0 && filled < targetBlocks) {
         
         const [row, col] = queue.shift();
-        if (Math.random() < 0.004) break;
+        if (Math.random() < 0.006) break;
 
         for (const [dx, dy] of dirs) {
             const x = row + dx;

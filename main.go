@@ -89,7 +89,7 @@ func processProject(inPath, outPath string) {
 	fmt.Printf("[x] Project: %s -> %s \n", inPath, outPath)
 	os.MkdirAll(outPath, os.ModePerm)
 
-	var cpp, html, css, js []byte
+	var cpp, h, html, css, js []byte
 	var err error
 
 	files, err := os.ReadDir(inPath)
@@ -110,6 +110,9 @@ func processProject(inPath, outPath string) {
 		switch ext {
 		case ".cpp":
 			cpp, err = os.ReadFile(full)
+		case ".h":
+			h, err = os.ReadFile(full)
+			os.WriteFile(filepath.Join(outPath, name), h, 0644)
 		case ".html":
 			html, err = os.ReadFile(full)
 		case ".css":
