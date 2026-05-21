@@ -57,7 +57,7 @@ function updateTrend(data) {
         const yH = height - ((hum - minHum) / (maxHum - minHum)) * height;
         humPoints.push(`${x},${yH}`);
 
-        const hpt = makeRect("hp", x, yH, "transparent");
+        const hpt = makeRect("hp", x, yH, "transparent", 5, 5);
         const hTip = makeTooltip(hpt, x+2, yH - 2, `${hum}%`);
         tooltips.appendChild(hTip);
     }
@@ -68,22 +68,22 @@ function updateTrend(data) {
 
 function updateMeters(data) {
     document.getElementById("temp-meter").value = data.temp;
-    document.getElementById("temp-value").textContent = data.temp.toFixed(1);
+    document.getElementById("temp-value").textContent = data.temp.toFixed(1) + " °C";
 
     document.getElementById("dp-meter").value = data.dp;
-    document.getElementById("dp-value").textContent = data.dp.toFixed(1);
-
-    document.getElementById("hum-meter").value = data.hum;
-    document.getElementById("hum-value").textContent = data.hum.toFixed(0);
-
-    document.getElementById("absHum-meter").value = data.absHum;
-    document.getElementById("absHum-value").textContent = data.absHum.toFixed(1);
-
-    document.getElementById("pres-meter").value = data.pres;
-    document.getElementById("pres-value").textContent = data.pres.toFixed(0);
+    document.getElementById("dp-value").textContent = data.dp.toFixed(1) + " °C";
 
     document.getElementById("wb-meter").value = data.wb;
-    document.getElementById("wb-value").textContent = data.wb.toFixed(1);
+    document.getElementById("wb-value").textContent = data.wb.toFixed(1) + " °C";
+
+    document.getElementById("hum-meter").value = data.hum;
+    document.getElementById("hum-value").textContent = data.hum.toFixed(0) + " %";
+
+    document.getElementById("absHum-meter").value = data.absHum;
+    document.getElementById("absHum-value").textContent = data.absHum.toFixed(1) + " g/m³";
+
+    document.getElementById("pres-meter").value = data.pres;
+    document.getElementById("pres-value").textContent = data.pres.toFixed(0) + " Pa";
 
     updateSky(data.lux ?? undefined);
 }
