@@ -4,6 +4,7 @@
 #include <Adafruit_BMP280.h>
 #include <Adafruit_SSD1306.h>
 #include "index_html.h"
+#include "bitmaps.h"
 
 const char* ssid = "MicroTik6_2GHz";
 const char* psk = "pwd";

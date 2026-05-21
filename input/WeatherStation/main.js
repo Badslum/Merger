@@ -83,22 +83,22 @@ function updateTrend(data) {
         const yH = height - ((hum - humMin) / (humMax - humMin)) * height;
         humPoints.push(`${x},${yH}`);
 
-        const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        tText.setAttribute("x", x + 2);
-        tText.setAttribute("y", yT - 2);
-        tText.setAttribute("font-size", "2");
-        tText.setAttribute("fill", "white");
-        tText.setAttribute("visibility", "hidden");
-        tText.textContent = `${temp}°C`;
+        const hText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        hText.setAttribute("x", x + 2);
+        hText.setAttribute("y", yT - 2);
+        hText.setAttribute("font-size", "2");
+        hText.setAttribute("fill", "white");
+        hText.setAttribute("visibility", "hidden");
+        hText.textContent = `${temp}°C`;
         
         const hpt = makeRect("hp", x, yH, "transparent");
-        hpt.addEventListener("mouseenter", () => {
-            hpt.setAttribute("fill", "blue");
-            hpt.textContent = `${temp}°C`;
+        tpt.addEventListener("mouseenter", () => {
+            tpt.setAttribute("fill", "blue");
+            hText.setAttribute("visibility", "visible");
         });
-        hpt.addEventListener("mouseleave", () => {
+        tpt.addEventListener("mouseleave", () => {
             tpt.setAttribute("fill", "transparent");
-            hpt.textContent = "";
+            hText.setAttribute("visibility", "hidden");
         });
     }
 
