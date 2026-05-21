@@ -249,30 +249,38 @@ void printValues(int start){
     display.setTextColor(WHITE);
 
     float t = current.temp;
-    display.drawBitmap( 0 + start,  0 + start , ICON_TEMP, 8, 8, WHITE);
-    display.setCursor( 10 + start,  0 + start);
-    display.printf("T: %.1fC", t);
-    Serial.printf("T: %.1fC\n", t);
+    display.drawBitmap( 0 + start, 0 + start, ICON_TEMP, 16, 16, WHITE);
+    display.setCursor( 16 + start, 0 + start);
+    display.printf("Temp:");
+    display.setCursor( 16 + start, 8 + start);
+    display.printf("%.1f°C", t);
+    Serial.printf("Temp: %.1f°C\n", t);
 
     float h = current.hum;
-    display.drawBitmap(64 + start,  0 + start , ICON_HUM,  8, 8, WHITE);
-    display.setCursor( 74 + start,  0 + start);
-    display.printf("H: %.0f%%", h);
-    Serial.printf("H: %.0f%%\n", h);
+    display.drawBitmap(64 + start, 0 + start, ICON_HUM, 16, 16, WHITE);
+    display.setCursor( 80 + start, 0 + start);
+    display.printf("Hum:");
+    display.setCursor( 80 + start, 8 + start);
+    display.printf("%.0f%%", h);
+    Serial.printf("Hum: %.0f%%\n", h);
 
     float dp = current.dewPoint();
-    display.drawBitmap( 0 + start, 32 + start , ICON_DP,   8, 8, WHITE);
-    display.setCursor( 10 + start, 32 + start);
-    display.printf("D: %.1fC", dp);
-    Serial.printf("D: %.1fC\n", dp);
+    display.drawBitmap( 0 + start, 32 + start, ICON_DP, 16, 16, WHITE);
+    display.setCursor( 16 + start, 32 + start);
+    display.printf("Dew:");
+    display.setCursor( 16 + start, 40 + start);
+    display.printf("%.1f°C", dp);
+    Serial.printf("Dew: %.1f°C\n", dp);
 
     float p = current.pres;
-    display.drawBitmap(64 + start, 32 + start , ICON_PRES, 8, 8, WHITE);
-    display.setCursor( 74 + start, 32 + start);
-    display.printf("P: %.0f", p);
-    Serial.printf("P: %.0f\n", p);
+    display.drawBitmap(64 + start, 32 + start, ICON_PRES, 16, 16, WHITE);
+    display.setCursor( 80 + start, 32 + start);
+    display.printf("Pres:");
+    display.setCursor( 80 + start, 40 + start);
+    display.printf("%.0fPa", p);
+    Serial.printf("Pres: %.0fPa\n", p);
 
     display.display();
-    Serial.printf("AH: %.1f\n",current.absHum());
-    Serial.printf("WB: %.1f\n", current.wetBulb());
+    Serial.printf("AbsHum: %.1f\n",current.absHum());
+    Serial.printf("WetBulb: %.1f\n", current.wetBulb());
 }
