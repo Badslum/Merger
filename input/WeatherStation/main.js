@@ -1,20 +1,22 @@
 let poller = null;
 function startPolling(endpoint = "/data", fn=updateMeters, interval=2000) {
     stopPolling();
-    poller = setInterval(async () => {
-        try {
-            const resp = await fetch(endpoint);
-            if (!resp.ok) {
-                console.log("HTTP", resp.status);
-                return;
-            }
-            const data = await resp.json();
-            fn(data);
-        } catch (ex) {
-            updateSky();
-            console.log("Fetch error:", ex);
+    poll(endpoint, fn);
+    poller = setInterval(() => poll(endpoint, fn), interval);
+}
+
+async function poll(endpoint = "/data", fn=updateMeters) {
+    try {
+        const resp = await fetch(endpoint);
+        if (!resp.ok) {
+            console.log("HTTP", resp.status);
+            return;
         }
-    }, interval);
+        const data = await resp.json();
+        fn(data);
+    } catch (ex) {
+        console.log("Fetch error:", ex);
+    }
 }
 
 function stopPolling() {
@@ -49,7 +51,7 @@ function updateTrend(data) {
         const yT = height - ((temp - minTemp) / (maxTemp - minTemp)) * height;
         tempPoints.push(`${x},${yT}`);
         
-        const tpt = makeRect("tp", x, yT, "transparent", 3, 3);
+        const tpt = makeRect("tp", x, yT, "transparent");
         const tTip = makeTooltip(tpt, x+2, yT - 2, `${temp}°C`);
         tooltips.appendChild(tpt);
         tooltips.appendChild(tTip);
@@ -58,7 +60,7 @@ function updateTrend(data) {
         const yH = height - ((hum - minHum) / (maxHum - minHum)) * height;
         humPoints.push(`${x},${yH}`);
 
-        const hpt = makeRect("hp", x, yH, "transparent", 3, 3);
+        const hpt = makeRect("hp", x, yH, "transparent");
         const hTip = makeTooltip(hpt, x+2, yH - 2, `${hum}%`);
         tooltips.appendChild(hpt);
         tooltips.appendChild(hTip);

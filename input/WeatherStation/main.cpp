@@ -217,15 +217,15 @@ void readBMP() {
 }
 
 void readDHT() {
-    float t = dht.readTemperature();
+    // float t = dht.readTemperature();
     float h = dht.readHumidity();
     
-    if (isnan(t) || isnan(h)) {
+    if (isnan(h)) {
         Serial.println("DHT values malformed");
         return;
     }
     
-    current.temp = t;
+    // current.temp = t;
     current.hum  = h;
 }
 
