@@ -167,7 +167,6 @@ h2 {
 
 #trend-graph text {
     fill: var(--fg);
-    font-size: 3px;
     paint-order: stroke;
     stroke: var(--bg);
     stroke-width: 0.5px;
