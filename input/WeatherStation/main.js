@@ -1,16 +1,3 @@
-document.getElementById("nav-report").addEventListener('click',() => {
-    console.log("REPORT CLICK");
-    document.getElementById("weather-report").hidden = false;
-    document.getElementById("weather-trend").hidden = true;
-    startPolling("/data",updateMeters,2000);
-});
-
-document.getElementById("nav-trend").addEventListener('click', () => {
-    document.getElementById("weather-report").hidden = true;
-    document.getElementById("weather-trend").hidden = false;
-    startPolling("/trend",updateTrend,15000);
-});
-
 let poller = null;
 function startPolling(endpoint = "/data", fn=updateMeters, interval=2000) {
     stopPolling();
@@ -24,6 +11,7 @@ function startPolling(endpoint = "/data", fn=updateMeters, interval=2000) {
             const data = await resp.json();
             fn(data);
         } catch (ex) {
+            updateSky();
             console.log("Fetch error:", ex);
         }
     }, interval);
@@ -39,7 +27,6 @@ function stopPolling() {
 function updateTrend(data) {
     
     const values = data.values;
-
     if (!values || values.length === 0) return;
 
     const maxTemp = 40;
@@ -51,55 +38,28 @@ function updateTrend(data) {
 
     const tempPoints = [];
     const humPoints = [];
+
     const tooltips = document.getElementById("trend-tooltips");
-    tooltips.innerHTML = ""; 
+    tooltips.innerHTML = "";
 
     for (let i = 0; i < values.length; i++){
         const x = (i / (values.length - 1)) * width;
 
         const temp = values[i][1];
-        const yT = height - ((temp - tempMin) / (tempMax - tempMin)) * height;
+        const yT = height - ((temp - minTemp) / (maxTemp - minTemp)) * height;
         tempPoints.push(`${x},${yT}`);
         
-        const tText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        tText.setAttribute("x", x + 2);
-        tText.setAttribute("y", yT - 2);
-        tText.setAttribute("font-size", "2");
-        tText.setAttribute("fill", "white");
-        tText.setAttribute("visibility", "hidden");
-        tText.textContent = `${temp}°C`;
-        
         const tpt = makeRect("tp", x, 0, "transparent");
-        tpt.addEventListener("mouseenter", () => {
-            tpt.setAttribute("fill", "blue");
-            tText.setAttribute("visibility", "visible");
-        });
-        tpt.addEventListener("mouseleave", () => {
-            tpt.setAttribute("fill", "transparent");
-            tText.setAttribute("visibility", "hidden");
-        });
+        const tTip = makeTooltip(tpt, x+2, yT - 2, `${temp}°C`);
+        tooltips.appendChild(tTip);
 
         const hum = values[i][2];
-        const yH = height - ((hum - humMin) / (humMax - humMin)) * height;
+        const yH = height - ((hum - minHum) / (maxHum - minHum)) * height;
         humPoints.push(`${x},${yH}`);
 
-        const hText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        hText.setAttribute("x", x + 2);
-        hText.setAttribute("y", yT - 2);
-        hText.setAttribute("font-size", "2");
-        hText.setAttribute("fill", "white");
-        hText.setAttribute("visibility", "hidden");
-        hText.textContent = `${temp}°C`;
-        
         const hpt = makeRect("hp", x, yH, "transparent");
-        tpt.addEventListener("mouseenter", () => {
-            tpt.setAttribute("fill", "blue");
-            hText.setAttribute("visibility", "visible");
-        });
-        tpt.addEventListener("mouseleave", () => {
-            tpt.setAttribute("fill", "transparent");
-            hText.setAttribute("visibility", "hidden");
-        });
+        const hTip = makeTooltip(hpt, x+2, yH - 2, `${hum}%`);
+        tooltips.appendChild(hTip);
     }
 
     document.getElementById("trend-temp").setAttribute("points", tempPoints.join(" "));
@@ -128,7 +88,7 @@ function updateMeters(data) {
     updateSky(data.lux ?? undefined);
 }
 
-function updateSky(lux) {
+function updateSky(lux=0) {
     const day = document.getElementById("day-sky");
     const night = document.getElementById("night-sky");
     if (lux > 480 || lux === undefined) {
@@ -153,8 +113,12 @@ function spawnSun() {
 
     for (let y = -r; y <= r; y++) {
         for (let x = -r; x <= r; x++) {
+            let color = "#f3eb1f";
+            if (x*x + y*y > (r-1)*(r-1)) {
+                color = "#d4c21a";
+            }
             if (x*x + y*y <= r*r) {
-                const e = makeRect("sun",cx+x,cy+y)
+                const e = makeRect("sun",cx+x,cy+y, color);
                 sun.appendChild(e);
             }
         }
@@ -211,13 +175,13 @@ function createCloud(posX, posY) {
             if (x < 0 || x >= rows) continue;
             if (y < 0 || y >= cols) continue;
             if (grid[x][y] !== 0) continue;
-            if (Math.random() < 0.25) continue;
+            if (Math.random() < 0.3) continue;
 
             grid[x][y] = 1;
-            const level = 1 + Math.floor(Math.random() * 5);
-            const opacity = 0.25 + level * 0.15;
+            const level = 1 + Math.floor(Math.random() * 4);
+            const opacity = 0.2 + level * 0.1;
             const e = makeRect("cloud",y,x,`rgba(255,255,255,${opacity})`);
-            
+            e.style.filter = "blur(0.2px)";
             cloud.appendChild(e);
             queue.push([x,y]);
             filled++;
@@ -238,17 +202,23 @@ function spawnMoon() {
 
     for (let y = -rOuter; y <= rOuter; y++) {
         for (let x = -rOuter; x <= rOuter; x++) {
-            const outer = (x*x + y*y <= rOuter*rOuter);
             const sx = x - offsetX;
+
+            const outer = (x*x + y*y <= rOuter*rOuter);
             const inner = (sx*sx + y*y <= rInner*rInner);
+
+            const outerRim = !((x*x + y*y < (rOuter-1)*(rOuter-1)) && !inner);
+            const innerRim = !(sx*sx + y*y < (rInner-1)*(rInner-1));
 
             if (outer) {
                 let color = "#04044e";
-                if (!inner) {
+                if (innerRim && outerRim){
+                    color = "#a6adc9";
+                } else if(!inner) {
                     color = "#cad4f5";
 
                     const dist = Math.sqrt(x*x + y*y) / rOuter;
-                    if (Math.random() < 0.16 && dist < 0.8) {
+                    if (Math.random() < 0.16 && dist < 0.8){
                         color = "#a6adc9";
                     }
                 }
@@ -293,6 +263,8 @@ function initTwinkle() {
 }
 
 function makeRect(group = "", x = 0, y = 0,color="#f3eb1f", width=1, height=1){
+    width += 0.1;
+    height += 0.1;
     const e = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     e.setAttribute("class", group);
     e.setAttribute("x", x);
@@ -303,7 +275,39 @@ function makeRect(group = "", x = 0, y = 0,color="#f3eb1f", width=1, height=1){
     return e;
 }
 
+function makeTooltip(parent = HTMLElement, x = 0, y = 0, text = ""){
+    const tip = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    tip.setAttribute("x", x);
+    tip.setAttribute("y", y);
+    tip.setAttribute("font-size", "2");
+    tip.setAttribute("fill", "white");
+    tip.setAttribute("visibility", "hidden");
+    tip.textContent = text;
+    parent.addEventListener("mouseenter", () => {
+        parent.setAttribute("fill", "blue");
+        tip.setAttribute("visibility", "visible");
+    });
+    parent.addEventListener("mouseleave", () => {
+        parent.setAttribute("fill", "transparent");
+        tip.setAttribute("visibility", "hidden");
+    });
+    return tip;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("nav-report").addEventListener('click',() => {
+        console.log("REPORT CLICK");
+        document.getElementById("weather-report").hidden = false;
+        document.getElementById("weather-trend").hidden = true;
+        startPolling("/data",updateMeters,2000);
+    });
+
+    document.getElementById("nav-trend").addEventListener('click', () => {
+        document.getElementById("weather-report").hidden = true;
+        document.getElementById("weather-trend").hidden = false;
+        startPolling("/trend",updateTrend,15000);
+    });
+
     document.getElementById("nav-report").click();
 
     spawnSun();

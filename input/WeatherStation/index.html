@@ -6,6 +6,7 @@
         <meta name="author" content="Bastian Roth">
         <meta name="date" content="10.05.2026">
         <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
         <script src="main.js" defer></script>
     </head>
     <body>
@@ -69,80 +70,68 @@
             <div id="grid">
                 <!-- Temperature -->
                 <div class="metric">
-                    <span class="label">
-                        Temperature
-                    </span>
-                    <meter id="temp-meter"
-                        min="-20"
-                        max="50">
-                    </meter>
-                    <span id="temp-value">
-                    </span>
+                    <span class="label">Temperature</span>
+                    <span class="value" id="temp-value"> </span>
+                    <meter id="temp-meter" min="-20" max="50"></meter>
+                    <div class="scale">
+                        <span>-20°</span>
+                        <span>50°</span>
+                    </div>
                 </div>
 
                 <!-- Dewpoint -->
                 <div class="metric">
-                    <span class="label">
-                        Dewpoint
-                    </span>
-                    <meter id="dp-meter"
-                        min="-20"
-                        max="50">
-                    </meter>
-                    <span id="dp-value">
-                    </span>
-                </div>
-
-                <!-- Humidity -->
-                <div class="metric">
-                    <span class="label">
-                        Humidity
-                    </span>
-                    <meter id="hum-meter"
-                        min="0"
-                        max="100">
-                    </meter>
-                    <span id="hum-value">
-                    </span>
-                </div>
-
-                <!-- Absolute humidity -->
-                <div class="metric">
-                    <span class="label">
-                        Absolute humidity
-                    </span>
-                    <meter id="absHum-meter"
-                        min="0"
-                        max="50">
-                    </meter>
-                    <span id="absHum-value">
-                    </span>
-                </div>
-
-                <!-- Pressure -->
-                <div class="metric">
-                    <span class="label">
-                        Pressure
-                    </span>
-                    <meter id="pres-meter"
-                        min="900"
-                        max="1100">
-                    </meter>
-                    <span id="pres-value">
-                    </span>
+                    <span class="label">Dewpoint</span>
+                    <span class="value" id="dp-value"> </span>
+                    <meter id="dp-meter" min="-20" max="50"></meter>
+                    <div class="scale">
+                        <span>-20°</span>
+                        <span>50°</span>
+                    </div>
                 </div>
 
                 <!-- Wetbulb -->
                 <div class="metric">
-                    <span class="label">
-                        Wetbulb
-                    </span>
-                    <meter id="wb-meter"
-                        min="-20"
-                        max="50">
-                    </meter>
-                    <span id="wb-value">
-                    </span>
+                    <span class="label">Wetbulb</span>
+                    <span class="value" id="wb-value"> </span>
+                    <meter id="wb-meter" min="-20" max="50"></meter>
+                    <div class="scale">
+                        <span>-20°</span>
+                        <span>50°</span>
+                    </div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="metric">
+                    <span class="label">Humidity</span>
+                    <span class="value" id="hum-value"> </span>
+                    <meter id="hum-meter" min="0" max="100"></meter>
+                    <div class="scale">
+                        <span>0%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+
+                <!-- Absolute humidity -->
+                <div class="metric">
+                    <span class="label">Absolute Humidity</span>
+                    <span class="value" id="absHum-value"> </span>
+                    <meter id="absHum-meter" min="0" max="50"></meter>
+                    <div class="scale">
+                        <span>0g</span>
+                        <span>50g</span>
+                    </div>
+                </div>
+
+                <!-- Pressure -->
+                <div class="metric">
+                    <span class="label">Pressure</span>
+                    <span class="value" id="pres-value"> </span>
+                    <meter id="pres-meter" min="900" max="1100"></meter>
+                    <div class="scale">
+                        <span>900</span>
+                        <span>1100</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -156,27 +145,24 @@
             <div id="trend-box">
                 <svg id="trend-graph" viewBox="0 0 128 40" preserveAspectRatio="none">
 
-                    <line x1="0" y1="40" x2="128" y2="40" stroke="rgba(255,255,255,0.5)" stroke-width="0.5"/>
-                    <line x1="0" y1="0"  x2="0"   y2="48" stroke="rgba(255,255,255,0.5)" stroke-width="0.5"/>
-
-                    <text x="0.5" y="2"  fill="rgba(255,255,255,0.5)" font-size="1"> 40°</text>
-                    <text x="0.5" y="10" fill="rgba(255,255,255,0.5)" font-size="1"> 30°</text>
-                    <text x="0.5" y="18" fill="rgba(255,255,255,0.5)" font-size="1"> 20°</text>
-                    <text x="0.5" y="26" fill="rgba(255,255,255,0.5)" font-size="1"> 10°</text>
-                    <text x="1"   y="34" fill="rgba(255,255,255,0.5)" font-size="1">  0°</text>
-                    <text x="0"   y="42" fill="rgba(255,255,255,0.5)" font-size="1">-10°</text>
+                    <text class="trend-scale" x="0.5" y="2"  font-size="1"> 40°</text>
+                    <text class="trend-scale" x="0.5" y="10" font-size="1"> 30°</text>
+                    <text class="trend-scale" x="0.5" y="18" font-size="1"> 20°</text>
+                    <text class="trend-scale" x="0.5" y="26" font-size="1"> 10°</text>
+                    <text class="trend-scale" x="1"   y="34" font-size="1">  0°</text>
+                    <text class="trend-scale" x="0"   y="42" font-size="1">-10°</text>
                     
                     <line x1="0" y1="8"    x2="128"   y2="8"  stroke="rgba(255,255,255,0.2)" stroke-width="0.1"/>
                     <line x1="0" y1="16"   x2="128"   y2="16" stroke="rgba(255,255,255,0.2)" stroke-width="0.1"/>
                     <line x1="0" y1="24"   x2="128"   y2="24" stroke="rgba(255,255,255,0.2)" stroke-width="0.1"/>
                     <line x1="0" y1="32"   x2="128"   y2="32" stroke="rgba(255,255,255,0.2)" stroke-width="0.1"/>
                     
-                    <text x="125.5" y="2"  fill="rgba(255,255,255,0.5)" font-size="1">100%</text>
-                    <text x="126"   y="10" fill="rgba(255,255,255,0.5)" font-size="1"> 80%</text>
-                    <text x="126"   y="18" fill="rgba(255,255,255,0.5)" font-size="1"> 60%</text>
-                    <text x="126"   y="26" fill="rgba(255,255,255,0.5)" font-size="1"> 40%</text>
-                    <text x="126"   y="34" fill="rgba(255,255,255,0.5)" font-size="1"> 20%</text>
-                    <text x="126.5" y="42" fill="rgba(255,255,255,0.5)" font-size="1">  0%</text>
+                    <text class="trend-scale" x="125.5" y="2"  font-size="1">100%</text>
+                    <text class="trend-scale" x="126"   y="10" font-size="1"> 80%</text>
+                    <text class="trend-scale" x="126"   y="18" font-size="1"> 60%</text>
+                    <text class="trend-scale" x="126"   y="26" font-size="1"> 40%</text>
+                    <text class="trend-scale" x="126"   y="34" font-size="1"> 20%</text>
+                    <text class="trend-scale" x="126.5" y="42" font-size="1">  0%</text>
 
                     <polyline id="trend-temp" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
                     <polyline id="trend-hum"  fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>

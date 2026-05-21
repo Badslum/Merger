@@ -1,38 +1,43 @@
-/* Backgroung and animation */
-body{
-    background-color: #2554ca;
+/* ===== Global ===== */
+body {
+    margin: 0;
+    font-family: "Outfit", sans-serif;
+    --bg: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.15);
 }
 
+body.day  {
+    --fg:#04044e;
+    --meter: linear-gradient(90deg, #1841b0, #5278df);
+}
+body.night{
+    --fg:#87cefa;
+    --meter: linear-gradient(90deg, #4fc3f7, #0288d1);
+}
+
+/* ===== Background SVG ===== */
 #back {
-    pointer-events: none;
-    position: absolute;
+    position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: -2;
+    pointer-events: none;
+    z-index: -1;
 }
 
-#night-sky{
-    display: none;
-}
+#night-sky { display: none; }
 
 #clouds {
     animation: drift 90s linear infinite;
-    transform-box: fill-box;
     transform-origin: 0 0;
 }
 
 @keyframes drift {
-    from { transform: translateX(0px); }
-    to   { transform: translateX(-256px); }
+    to { transform: translateX(-256px); }
 }
 
-/* headerbar */
+/* ===== Header ===== */
 #headerbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
     height: 20vh;
     display: flex;
     align-items: center;
@@ -40,119 +45,131 @@ body{
 }
 
 h1 {
-    font-size: 48px;
-    text-align: center;
-    color: inherit;
     margin: 0;
+    font-size: 48px;
+    color: var(--fg);
 }
 
-body.day {
-    color: #04044e;
-    border: #04044e;
-}
-
-body.night {
-    color: #87cefa;
-    border: #87cefa;
-}
-
-/* Navbar */
-
+/* ===== Navbar ===== */
 #navbar {
-    position: relative;
-    margin-top: 25vh;
-    width: 100%;
-    height: 5%;
-    align-items: center;
+    margin-top: 10vh;
     display: grid;
     grid-template-columns: repeat(2,1fr);
 }
 
 .nav-opt {
     cursor: pointer;
-    z-index: 2;
-    padding: 4px;
-    background-color: inherit;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.nav-opt:hover{
-    opacity: 0.5;
-}
-
-/* Weather report */
-h2 {
-    font-size: 24px;
     text-align: center;
-    margin-top: 5vh;
-    margin-bottom: 20px;
-    color: inherit;
+    color: var(--fg);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+    transition: 0.2s;
 }
 
+.nav-opt:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ===== Section Titles ===== */
+h2 {
+    text-align: center;
+    margin: 4vh 0 2vh;
+    font-size: 24px;
+    color: var(--fg);
+}
+
+/* ===== Weather Grid ===== */
 #grid {
-    position: relative;
     width: 90%;
-    height: 60%;
-    margin: 0 auto;
+    margin: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(3,1fr);
+    gap: 24px;
 }
 
-/* Metrics */
 .metric {
-    background: transparent;
-    border: 2px solid rgba(255,255,255,0.2);
-    padding: 30px;
-    border-radius: 4px;
-    font-family: "Press Start 2P", monospace;
-    font-size: 16px;
-    color: inherit;
+    position: relative;
+    padding: 24px;
+    border-radius: 12px;
+    color: var(--fg);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    min-height: 128px;
 }
 
 .metric .label {
-    display: block;
-    height: 16px;
-    margin: 6px;
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    padding: 0 6px;
+    font-size: 14px;
+    color: var(--fg);
+    opacity: 0.9;
+}
+
+.metric .value {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 12px 0;
+}
+
+.metric .scale {
+    display: flex;
+    justify-content: space-between;
+    align-self: baseline;
+    font-size: 12px;
+    color: var(--fg);
+    opacity: 0.7;
+    margin-bottom: 6px;
 }
 
 .metric meter {
     width: 100%;
-    height: 15px;
-    margin: 8px 0;
-    border: 1px solid inherit;
+    height: 18px;
+    appearance: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
 }
 
-.metric .value {
-    display: block;
-    margin-top: 4px;
-    color: inherit;
+.metric meter::-webkit-meter-bar {
+    background: transparent;
 }
 
-/* Trend */
+.metric meter::-webkit-meter-optimum-value {
+    background: var(--meter);
+}
+
+/* ===== Trend Graph ===== */
 #trend-box {
-    position: relative;
     width: 90%;
-    height: 60%;
-    margin: 0 auto;
+    margin: auto;
 }
 
 #trend-graph {
     width: 100%;
-    height: auto;
     display: block;
-    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(6px);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
 }
 
-/*Media width*/
+.trend-scale {
+    fill: var(--fg);
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 900px) {
-    #weather-report {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    #grid { grid-template-columns: repeat(2,1fr); }
 }
 
 @media (max-width: 600px) {
-    #weather-report {
-        grid-template-columns: 1fr;
-    }
+    #grid { grid-template-columns: 1fr; }
 }
