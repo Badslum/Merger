@@ -36,7 +36,7 @@ function updateTrend(data) {
     const maxHum = 100;
     const minHum = 0;
     const width = 128;
-    const height = 32;
+    const height = 40;
 
     const tempPoints = [];
     const humPoints = [];
@@ -57,7 +57,7 @@ function updateTrend(data) {
         tooltips.appendChild(tTip);
 
         const hum = values[i][2];
-        const yH = height - ((hum * height) / (maxHum - minHum)) - 8;
+        const yH = height - ((hum * height) / (maxHum - minHum));
         humPoints.push(`${x},${yH}`);
 
         const hpt = makeRect("hp", x, yH, "transparent");
@@ -300,7 +300,6 @@ function makeTooltip(parent = HTMLElement, x = 0, y = 0, text = ""){
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("nav-report").addEventListener('click',() => {
-        console.log("REPORT CLICK");
         document.getElementById("weather-report").hidden = false;
         document.getElementById("weather-trend").hidden = true;
         startPolling("/data",updateMeters,2000);

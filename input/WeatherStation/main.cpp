@@ -253,8 +253,8 @@ void printValues(int start){
     display.setCursor( 16 + start, 0 + start);
     display.printf("Temp:");
     display.setCursor( 16 + start, 8 + start);
-    display.printf("%.1f°C", t);
-    Serial.printf("Temp: %.1fC\n", t);
+    display.printf("%.1fC", t);
+    Serial.printf("Temp: %.1f°C\n", t);
 
     float h = current.hum;
     display.drawBitmap(64 + start, 0 + start, ICON_HUM, 16, 16, WHITE);
@@ -273,7 +273,7 @@ void printValues(int start){
     Serial.printf("Dew: %.1f°C\n", dp);
 
     float p = current.pres;
-    display.drawXBitmap(64 + start, 32 + start, ICON_PRES, 16, 16, WHITE);
+    display.drawBitmap(64 + start, 32 + start, ICON_PRES, 16, 16, WHITE);
     display.setCursor( 80 + start, 32 + start);
     display.printf("Pres:");
     display.setCursor( 80 + start, 40 + start);
