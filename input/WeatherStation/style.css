@@ -1,4 +1,4 @@
-/* ===== Global ===== */
+/* ---- Global ---- */
 body {
     margin: 0;
     font-family: "Outfit", sans-serif;
@@ -15,7 +15,7 @@ body.night{
     --meter: linear-gradient(90deg, #4fc3f7, #0288d1);
 }
 
-/* ===== Background SVG ===== */
+/* ---- Background SVG ---- */
 #back {
     position: fixed;
     inset: 0;
@@ -36,7 +36,7 @@ body.night{
     to { transform: translateX(-256px); }
 }
 
-/* ===== Header ===== */
+/* ---- Header ---- */
 #headerbar {
     height: 20vh;
     display: flex;
@@ -50,7 +50,7 @@ h1 {
     color: var(--fg);
 }
 
-/* ===== Navbar ===== */
+/* ---- Navbar ---- */
 #navbar {
     margin-top: 10vh;
     display: grid;
@@ -73,7 +73,7 @@ h1 {
     background: rgba(255,255,255,0.2);
 }
 
-/* ===== Section Titles ===== */
+/* ---- Section Titles ---- */
 h2 {
     text-align: center;
     margin: 4vh 0 2vh;
@@ -81,7 +81,7 @@ h2 {
     color: var(--fg);
 }
 
-/* ===== Weather Grid ===== */
+/* ---- Meters ---- */
 #grid {
     width: 90%;
     margin: auto;
@@ -150,7 +150,7 @@ h2 {
     background: var(--meter);
 }
 
-/* ===== Trend Graph ===== */
+/* ---- Trend ---- */
 #trend-box {
     width: 90%;
     margin: auto;
@@ -176,7 +176,7 @@ h2 {
     fill: var(--fg);
 }
 
-/* ===== Responsive ===== */
+/* ---- Scaling ---- */
 @media (max-width: 900px) {
     #grid { grid-template-columns: repeat(2,1fr); }
 }
